@@ -44,7 +44,7 @@ job.scheduled_at # => 2026-05-14 23:02:52
 job.completed_at # => 2026-05-18 11:36:13
 ```
 
-Fetches an invoice from Jobber:
+Fetches a non-draft invoice from Jobber:
 
 ```ruby
 invoice = oauth.invoices.find 'MjU3ODA0'

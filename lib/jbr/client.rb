@@ -32,7 +32,7 @@ module Jbr
 
     def find_by_phone(phone)
       output = @oauth.query LOOKUP, variables: { searchTerm: phone }
-      recent = output.dig('clientPhones', 'nodes').max_by do |clients|
+      recent = (output.dig('clientPhones', 'nodes') || []).max_by do |clients|
         clients.dig('client', 'updatedAt') || ''
       end
       @id = recent&.dig 'client', 'id'

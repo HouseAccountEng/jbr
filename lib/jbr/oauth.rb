@@ -14,6 +14,7 @@ module Jbr
       @refresh_token = credentials[:refresh_token]
       @expires_at = credentials[:expires_at]
       @account_id = credentials[:account_id]
+      @invalid_at = credentials[:invalid_at]
     end
 
     attr_reader :access_token, :refresh_token, :expires_at, :invalid_at
@@ -29,7 +30,6 @@ module Jbr
     def query(statement, variables: {})
       client.query statement, variables: variables
     rescue GraphQL::Unauthorized => e
-      return if JSON(e.message).fetch('message', '').include?('delete this token')
       refresh ? retry : {}
     end
 

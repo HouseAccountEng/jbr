@@ -10,8 +10,10 @@ module Jbr
 
     def find(id)
       output = @oauth.query FIND, variables: { id: id  }
-      @id = output.dig 'quote', 'id'
-      @request_id = output.dig 'quote', 'request', 'id'
+      return unless quote = output['quote']
+
+      @id = quote['id']
+      @request_id = quote.dig 'request', 'id'
       self
     end
   end

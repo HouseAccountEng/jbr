@@ -10,10 +10,12 @@ module Jbr
 
     def find(id)
       output = @oauth.query FIND, variables: { id: id  }
-      @id = output.dig 'job', 'id'
-      @quote_id = output.dig 'job', 'quote', 'id'
-      @scheduled_at = output.dig 'job', 'startAt'
-      @completed_at = output.dig 'job', 'completedAt'
+      return unless job = output['job']
+
+      @id = job['id']
+      @quote_id = job.dig 'quote', 'id'
+      @scheduled_at = job['startAt']
+      @completed_at = job['completedAt']
       self
     end
 

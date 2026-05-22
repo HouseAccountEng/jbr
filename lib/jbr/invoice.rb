@@ -11,12 +11,17 @@ module Jbr
 
     def find(id)
       output = @oauth.query FIND, variables: { id: id  }
-      job = output.dig('jobs', 'nodes', 0) || {}
-      @id = job['id']
-      @status = job['invoiceStatus']
-      @total = job['total']
-      @issued_date = job['issuedDate']
+      return unless invoice = output['invoice']
+      return if invoice['invoiceStatus'].eql? 'draft'
+
+      @id = invoice['id']
+      @total = invoice['total']
+      @issued_date = invoice['issuedDate']
+
+      job = invoice.dig('jobs', 'nodes', 0) || {}
+      @job_id = job['id']
       @completed_at = job['completedAt']
+
       self
     end
 
