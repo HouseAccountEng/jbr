@@ -1,4 +1,4 @@
-## [1.0.1] - 2026-05-22
+## [1.0.2] - 2026-05-22
 
 - [Fix] Ensure .find returns nil if the Jobber resource is not found
 
