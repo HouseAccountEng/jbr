@@ -16,7 +16,7 @@ module Jbr
 
       @id = invoice['id']
       @total = invoice['total']
-      @issued_date = invoice['issuedDate']
+      @issued_at = invoice['issuedDate']
 
       job = invoice.dig('jobs', 'nodes', 0) || {}
       @job_id = job['id']
@@ -25,9 +25,9 @@ module Jbr
       self
     end
 
-    # @return [Date] the invoice issued date
-    def issued_date
-      Date.iso8601(@issued_date) if @issued_date
+    # @return [Date] the invoice issued time
+    def issued_at
+      Time.iso8601(@issued_at) if @issued_at
     end
 
     # @return [Time] the job completed time

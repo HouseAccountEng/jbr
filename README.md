@@ -51,7 +51,7 @@ invoice = oauth.invoices.find 'MjU3ODA0'
 invoice.id # => 'MjU3ODA0'
 invoice.job_id # => 'Z2lkOi8vS'
 invoice.total # => '40.30'
-invoice.issued_date # => 2026-05-22
+invoice.issued_at # => 2026-05-22 12:12:53
 invoice.completed_at # => 2026-05-22 14:32:53
 ```
 
