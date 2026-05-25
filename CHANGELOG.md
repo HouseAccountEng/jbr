@@ -1,3 +1,7 @@
+## [1.0.6] - 2026-05-24
+
+- [Change] Return mock.oauth_error as the message of Jbr::Error
+
 ## [1.0.5] - 2026-05-24
 
 - [Feature] Add mocks to help apps test Jobber integration
