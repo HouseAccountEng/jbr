@@ -40,7 +40,7 @@ module Jbr
     # @return [Hash] the data Jobber answered, or empty when the credentials are dead.
     def query(statement, variables: {})
       client.query statement, variables: variables
-    rescue GraphQL::Unauthorized => e
+    rescue GraphQL::Unauthorized
       refresh ? retry : {}
     end
 

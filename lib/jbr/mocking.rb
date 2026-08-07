@@ -10,19 +10,19 @@ module Jbr
     # @param params [Hash] the +code+ and +redirect_uri+ to exchange.
     # @return [OAuth] credentials for the account that authorized the app.
     def create_oauth(params = {})
-      (@mock ? Mock::OAuth : OAuth).create **params
+      (@mock ? Mock::OAuth : OAuth).create(**params)
     end
 
     # @param params [Hash] the +redirect_uri+ and +state+ to come back with.
     # @return [String] the URL a Jobber user authorizes the app on.
     def oauth_url_for(params = {})
-      (@mock ? Mock::URL : URL).for **params
+      (@mock ? Mock::URL : URL).for(**params)
     end
 
     # @param params [Hash] credentials already on file.
     # @return [OAuth] those credentials, ready to read and write with.
     def oauth_for(params = {})
-      (@mock ? Mock::OAuth : OAuth).new params
+      (@mock ? Mock::OAuth : OAuth).new(params)
     end
   end
 
