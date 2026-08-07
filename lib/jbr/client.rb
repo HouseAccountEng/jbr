@@ -72,7 +72,7 @@ module Jbr
       output = @oauth.query CREATE, variables: { input: input }
       @id = output.dig 'clientCreate', 'client', 'id'
 
-      properties = output.dig 'clientCreate', 'client', 'clientProperties', 'nodes'
+      properties = output.dig('clientCreate', 'client', 'clientProperties', 'nodes') || []
       @property_id = (properties.first || {})['id']
     end
 
