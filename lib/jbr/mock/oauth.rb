@@ -8,8 +8,6 @@ module Jbr
 
     def delete; end
 
-  private
-
     def self.post(_)
       raise Error, Jbr.mock.oauth_error if Jbr.mock.oauth_error
 

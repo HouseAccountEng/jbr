@@ -50,6 +50,19 @@ module Jbr
     # @return [String, nil] The client secret to interact with the API.
     def self.client_secret = ENV['JOBBER_CLIENT_SECRET']
 
+    # Exchange a code or a refresh token for credentials. Public because #refresh
+    # reaches it through self.class, which a private class method forbids.
+    def self.post(params = {})
+      uri = URI 'https://api.getjobber.com/api/oauth/token'
+      response = Net::HTTP.post_form uri,
+        params.merge(client_id: client_id, client_secret: client_secret)
+      raise Error, response.body unless response.is_a? Net::HTTPSuccess
+      output = JSON.parse(response.body)
+      { access_token: output['access_token'], refresh_token: output['refresh_token'],
+        expires_at: (Time.now + output.fetch('expires_in', 3600).to_i),
+      }
+    end
+
   private
 
     def refresh
@@ -62,20 +75,9 @@ module Jbr
       false
     end
 
-    def self.post(params = {})
-      uri = URI 'https://api.getjobber.com/api/oauth/token'
-      response = Net::HTTP.post_form uri,
-params.merge(client_id: client_id, client_secret: client_secret)
-      raise Error, response.body unless response.is_a? Net::HTTPSuccess
-      output = JSON.parse(response.body)
-      { access_token: output['access_token'], refresh_token: output['refresh_token'],
-        expires_at: (Time.now + output.fetch('expires_in', 3600).to_i),
-      }
-    end
-
     def client
-      GraphQL::Client.new endpoint: 'https://api.getjobber.com/api/graphql', token: @access_token,
-headers: headers
+      GraphQL::Client.new endpoint: 'https://api.getjobber.com/api/graphql',
+        token: @access_token, headers: headers
     end
 
     def headers = { 'X-JOBBER-GRAPHQL-VERSION' => '2026-04-22' }

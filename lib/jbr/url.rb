@@ -6,8 +6,7 @@ module Jbr
       uri.to_s
     end
 
-  private
-
     def self.client_id = ENV['JOBBER_CLIENT_ID']
+    private_class_method :client_id
   end
 end
