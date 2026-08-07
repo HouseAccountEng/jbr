@@ -1,8 +1,11 @@
-## [Unreleased]
+## [2.0.0] - 2026-08-07
 
 - [Fix] Require nothing but the standard library: to_query, present?, pluck,
   stringify_keys and Time.current were ActiveSupport calls the gemspec never declared,
   so `require 'jbr'` raised outside Rails
+- [Fix] Reuse the property already on a client's file instead of adding a duplicate on
+  every request: the lookup read the address as `street`, while the comparison built it
+  as `street1`, so it never matched
 - [Fix] Client#create no longer raises when Jobber answers without clientProperties
 - [Feature] Test every line, with SimpleCov failing the suite below 100% coverage
 - [Change] Extract Jbr::Property from Jbr::Client

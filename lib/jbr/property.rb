@@ -11,13 +11,14 @@ module Jbr
       }
     GRAPHQL
 
+    # What Jobber calls each address field, against what a caller passes.
+    FIELDS = { street1: :street, city: :city, province: :state, postalCode: :zip }
+
     # The address as Jobber takes it, from the fields a caller passes.
     # @param fields [Hash] any of :street, :city, :state and :zip.
     # @return [Hash] the address, without the fields the caller left out.
     def self.address_from(fields = {})
-      { street1: fields[:street], city: fields[:city],
-        province: fields[:state], postalCode: fields[:zip],
-      }.compact
+      FIELDS.to_h { |jobber, ours| [ jobber, fields[ours] ] }.compact
     end
 
     # Reach the property at an address, adding one when none of the client's matches.
@@ -27,13 +28,23 @@ module Jbr
     # @return [String, nil] the property ID.
     def find_or_create_for(client_id:, address:, existing: [])
       wanted = self.class.address_from address
-      match = existing.find { |property| wanted.transform_keys(&:to_s) == property['address'] }
+      match = existing.find { |property| same_address? wanted, property['address'] }
       return match['id'] if match
 
       output = @oauth.query CREATE, variables: {
         clientId: client_id, input: { properties: [ { address: wanted } ] },
       }
       (output&.dig('propertyCreate', 'properties')&.first || {})['id']
+    end
+
+  private
+
+    # Field by field, because Jobber answers every field it was asked for, nil included,
+    # while a caller's address carries only what they had -- an absent field and a nil
+    # one are the same address. Every field has to agree: a home with no street parsed
+    # must not match the one house on the client's file that does have one.
+    def same_address?(wanted, address)
+      FIELDS.each_key.all? { |field| wanted[field] == (address || {})[field.to_s] }
     end
   end
 end
