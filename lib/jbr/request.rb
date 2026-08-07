@@ -1,11 +1,14 @@
 module Jbr
+  # A lead on a Jobber user's board: work someone asked them for.
   class Request < Resource
+    # The mutation that opens a request against a client and a property.
     CREATE = <<~GRAPHQL
       mutation($input: RequestCreateInput!) {
         requestCreate(input: $input) { request { id property { id } } userErrors { message } }
       }
     GRAPHQL
 
+    # @return [String, nil] the client the request was opened against.
     attr_reader :client_id
 
     # Create a lead in Jobber associated to a new or existing client, matched by phone.

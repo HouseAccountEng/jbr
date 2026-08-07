@@ -17,6 +17,7 @@ require 'jbr/account'
 require 'jbr/client'
 require 'jbr/invoice'
 require 'jbr/job'
+require 'jbr/property'
 require 'jbr/quote'
 
 require 'jbr/mock/oauth'

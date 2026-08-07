@@ -1,4 +1,5 @@
 module Jbr
+  # One webhook Jobber posted, and the signature header it arrives under.
   class Event
     # @see https://developer.getjobber.com/docs/using_jobbers_api/setting_up_webhooks
     SIGNATURE_HEADER = 'X-Jobber-Hmac-SHA256'

@@ -1,5 +1,8 @@
 module Jbr
+  # Credentials for one Jobber account, and the gateway to everything read or written
+  # with them. An expired access token is refreshed and the call retried once.
   class OAuth
+    # The mutation that revokes the app on the account.
     DISCONNECT_MUTATION = <<~GRAPHQL
       mutation Disconnect {
         appDisconnect {
@@ -9,6 +12,7 @@ module Jbr
       }
     GRAPHQL
 
+    # @param credentials [Hash] the tokens, their expiry, the account and when it went bad.
     def initialize(credentials = {})
       @access_token = credentials[:access_token]
       @refresh_token = credentials[:refresh_token]
@@ -17,9 +21,12 @@ module Jbr
       @invalid_at = credentials[:invalid_at]
     end
 
+    # The credentials as Jobber last gave them, plus the moment a refusal to refresh landed.
     attr_reader :access_token, :refresh_token, :expires_at, :invalid_at
+    # @return [String, nil] the account these credentials reach.
     attr_accessor :account_id
 
+    # The resources these credentials read and write.
     def account = Account.new oauth: self
     def clients = Client.new oauth: self
     def invoices = Invoice.new oauth: self
@@ -27,6 +34,10 @@ module Jbr
     def quotes = Quote.new oauth: self
     def requests = Request.new oauth: self
 
+    # Run a statement, refreshing the access token once if Jobber says it expired.
+    # @param statement [String] the query or mutation to run.
+    # @param variables [Hash] the variables it interpolates.
+    # @return [Hash] the data Jobber answered, or empty when the credentials are dead.
     def query(statement, variables: {})
       client.query statement, variables: variables
     rescue GraphQL::Unauthorized => e
@@ -39,6 +50,10 @@ module Jbr
     rescue GraphQL::Unauthorized => e
     end
 
+    # Exchange an authorization code for credentials, then learn their account.
+    # @param code [String] the code Jobber sent to the redirect URI.
+    # @param redirect_uri [String] the URI the code came back to.
+    # @return [OAuth] the new credentials.
     def self.create(code:, redirect_uri:)
       credentials = post code: code, redirect_uri: redirect_uri, grant_type: 'authorization_code'
       new(credentials).tap { |oauth| oauth.account_id = oauth.account.id }

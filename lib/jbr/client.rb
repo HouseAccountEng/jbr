@@ -1,5 +1,7 @@
 module Jbr
+  # A person a Jobber user works for, and the property the work happens at.
   class Client < Resource
+    # The query that finds a client by phone, with the properties already on file.
     LOOKUP = <<~GRAPHQL
       query($searchTerm: String!) {
         clientPhones(first: 1, searchTerm: $searchTerm) { nodes {
@@ -8,6 +10,7 @@ module Jbr
       }
     GRAPHQL
 
+    # The mutation that opens a client, with a first property when an address is given.
     CREATE = <<~GRAPHQL
       mutation($input: ClientCreateInput!) {
         clientCreate(input: $input) {
@@ -17,15 +20,7 @@ module Jbr
       }
     GRAPHQL
 
-    CREATE_PROPERTY = <<~GRAPHQL
-      mutation propertyCreateMutation($clientId: EncodedId!, $input: PropertyCreateInput!) {
-        propertyCreate(clientId: $clientId, input: $input) {
-          properties { id }
-          userErrors { message }
-        }
-      }
-    GRAPHQL
-
+    # @return [String, nil] the property the work happens at.
     attr_reader :property_id
 
     # Create a client instance with the provided attributes.
@@ -39,6 +34,9 @@ module Jbr
       self.tap { @create_params = params }
     end
 
+    # Reach the client behind a phone number, opening one if Jobber has none.
+    # @param phone [String] the number to match on.
+    # @return [Client] itself.
     def find_or_create_by(phone:)
       find_by_phone(phone) || create
       self
@@ -54,20 +52,9 @@ module Jbr
       return unless recent
 
       @id = recent.dig 'client', 'id'
-
-      properties = recent.dig('client', 'clientProperties', 'nodes') || []
-      existing_property = properties.find do |property|
-        extract_address_from(@create_params[:address]).transform_keys(&:to_s) == property['address']
-      end
-      @property_id = if existing_property
-        existing_property['id']
-      else
-        property = @oauth.query CREATE_PROPERTY,
-variables: { clientId: @id,
-input: { properties: [ { address: extract_address_from(@create_params[:address]) } ] },
-}
-        (property&.dig('propertyCreate', 'properties')&.first || {})['id']
-      end
+      @property_id = Property.new(oauth: @oauth).find_or_create_for client_id: @id,
+        address: @create_params[:address],
+        existing: recent.dig('client', 'clientProperties', 'nodes') || []
       true
     end
 
@@ -83,19 +70,12 @@ input: { properties: [ { address: extract_address_from(@create_params[:address])
       address, email = @create_params[:address], @create_params[:email]
       { firstName: @create_params[:first_name],
         lastName: @create_params[:last_name],
-        properties: ([ { address: extract_address_from(address) } ] if present?(address)),
+        properties: ([ { address: Property.address_from(address) } ] if present?(address)),
         phones: [ { number: @create_params[:phone], primary: true } ],
         emails: ([ { address: email, primary: true } ] if present?(email)),
       }.compact
     end
 
     def present?(value) = !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
-
-    def extract_address_from(fields = {})
-      {
-        street1: fields[:street], city: fields[:city],
-        province: fields[:state], postalCode: fields[:zip],
-      }.compact
-    end
   end
 end
