@@ -1,5 +1,7 @@
 # Jobber API Ruby client
 
+A client for the Jobber GraphQL API. It needs nothing but the standard library.
+
 ## Available methods
 
 ### Credentials
@@ -9,6 +11,7 @@ Generate the URL for Jobber users to authorize the app:
 ```ruby
 url = Jbr.oauth_url_for redirect_uri:, state:
 url # => 'https://api.getjobber.com/api/oauth/authorize?state=...&redirect_uri=...'
+```
 
 Create credentials with a code and a redirect URI:
 
@@ -19,17 +22,17 @@ oauth = Jbr.create_oauth code:, redirect_uri:
 Initialize with existing credentials:
 
 ```ruby
-oauth = Jbr.oauth_for access_token:, refresh_token, expires_at:, account_id:
+oauth = Jbr.oauth_for access_token:, refresh_token:, expires_at:, account_id:
 ```
 
 Access OAuth attributes:
 
-```
+```ruby
 oauth.access_token # => 'eyJhbGciOiJIUzI1NiJ'
 oauth.refresh_token # => 'ea02775958c5fca28d'
 oauth.expires_at # => 2026-05-22 14:32:53
 oauth.account_id # => 'Z2lkOi8vSm9iYmV'
-````
+```
 
 Revoke credentials:
 
@@ -90,8 +93,8 @@ Parse the payload of a Jobber event webhook:
 ```ruby
 event = Jbr::Event.new data: { webHookEvent: { topic: 'JOB_CREATE', appId: 'app-1',
   accountId: 'account-1', itemId: 'job-1', occurredAt: '2026-05-22T15:46:33Z' } }
-event.account_id = 'account-1
-event.item_id = 'job-1
+event.account_id # => 'account-1'
+event.item_id # => 'job-1'
 ```
 
 ## Available mocks
@@ -115,7 +118,7 @@ Jbr.mock.oauth_error = 'Flow rejected'
 Mock a custom redirect URL:
 
 ```ruby
-Jbr.mock.oauth_url_for = 'https://example.com'
+Jbr.mock.oauth_url = 'https://example.com'
 ```
 
 ### Requests
