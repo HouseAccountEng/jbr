@@ -14,9 +14,10 @@ module Jbr
     # What Jobber calls each address field, against what a caller passes.
     FIELDS = { street1: :street, city: :city, province: :state, postalCode: :zip }
 
-    # The fields a match is made on. The state is written but never matched: Jobber
-    # takes it as either "North Carolina" or "NC", and the ZIP already places the home.
-    MATCHED = %i[street1 city postalCode]
+    # The fields a match is made on. City and state are written but never matched:
+    # Jobber holds whatever was typed, so "NC" and "North Carolina" -- or "Winston Salem"
+    # and "Winston-Salem" -- would read as two homes. The ZIP already places the home.
+    MATCHED = %i[street1 postalCode]
 
     # The address as Jobber takes it, from the fields a caller passes.
     # @param fields [Hash] any of :street, :city, :state and :zip.
