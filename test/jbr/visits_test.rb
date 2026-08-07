@@ -6,7 +6,13 @@ class VisitsTest < Minitest::Test
       'postalCode' => '27601', 'coordinates' => { 'latitude' => 35.77, 'longitude' => -78.63 },
     }
     client = { 'id' => 'client-01', 'firstName' => 'Jane', 'lastName' => 'Doe',
-      'phone' => '5553335555', 'email' => 'jane@example.com',
+      'email' => 'jane@example.com',
+      'phones' => [ { 'normalizedPhoneNumber' => '+441632960001', 'primary' => true,
+                      'smsAllowed' => true, },
+                    { 'normalizedPhoneNumber' => '+15553335555', 'primary' => false,
+                      'smsAllowed' => true, },
+                    { 'normalizedPhoneNumber' => '+15554446666', 'primary' => false,
+                      'smsAllowed' => false, }, ],
     }
     node = { 'id' => 'visit-01', 'title' => 'Tune-up', 'job' => { 'id' => 'job-01' },
       'client' => client, 'property' => { 'id' => 'property-01', 'address' => address },

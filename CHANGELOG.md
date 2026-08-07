@@ -1,3 +1,10 @@
+## [2.3.0] - 2026-08-07
+
+- [Breaking change] A client's phone is the number Jobber holds as reachable rather than
+  the string on the record: the primary before the rest, one that takes texts before one
+  that does not, and the first of those the North American plan recognizes, ten digits
+  without the country code. A client with no such number now answers nil
+
 ## [2.2.0] - 2026-08-07
 
 - [New] Carry the client a visit is for -- id, first name, last name, phone and email --

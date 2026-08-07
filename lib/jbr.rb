@@ -14,7 +14,8 @@ require 'jbr/request'
 require 'jbr/oauth'
 
 require 'jbr/account'
-# Property comes before Client and Visit: their queries read its fields as they load.
+# Phone and Property come before Client and Visit: their queries read these as they load.
+require 'jbr/phone'
 require 'jbr/property'
 require 'jbr/client'
 require 'jbr/invoice'

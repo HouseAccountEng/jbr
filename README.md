@@ -101,6 +101,7 @@ visit.job_id # => 'Z2lkOi8vS'
 visit.property_id # => 'Z2lkOi8vS'
 visit.client # => { id: 'Z2lkOi8vS', first_name: 'Jane', last_name: 'Doe',
              #      phone: '5553335555', email: 'jane@example.com' }
+             # phone is the reachable North American number, ten digits, or nil
 visit.address # => { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601',
               #      latitude: 35.77, longitude: -78.63 }
 visit.starts_at # => 2026-08-09 14:00:00
