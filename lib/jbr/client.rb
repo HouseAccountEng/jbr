@@ -57,7 +57,7 @@ module Jbr
 
       properties = recent.dig('client', 'clientProperties', 'nodes') || []
       existing_property = properties.find do |property|
-        extract_address_from(@create_params[:address]).stringify_keys == property['address']
+        extract_address_from(@create_params[:address]).transform_keys(&:to_s) == property['address']
       end
       @property_id = if existing_property
         existing_property['id']
@@ -79,11 +79,13 @@ module Jbr
     def input
       { firstName: @create_params[:first_name],
         lastName: @create_params[:last_name],
-        properties: ([{ address: extract_address_from(@create_params[:address]) }] if @create_params[:address].present?),
+        properties: ([{ address: extract_address_from(@create_params[:address]) }] if present?(@create_params[:address])),
         phones: [{ number: @create_params[:phone], primary: true }],
-        emails: ([{ address: @create_params[:email], primary: true }] if @create_params[:email].present?)
+        emails: ([{ address: @create_params[:email], primary: true }] if present?(@create_params[:email]))
       }.compact
     end
+
+    def present?(value) = !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
 
     def extract_address_from(fields = {})
       {

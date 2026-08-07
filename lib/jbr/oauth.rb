@@ -58,7 +58,7 @@ module Jbr
       @refresh_token = output[:refresh_token]
       @expires_at = output[:expires_at]
     rescue Error => e
-      @invalid_at = Time.current
+      @invalid_at = Time.now
       false
     end
 
@@ -68,7 +68,7 @@ module Jbr
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
       output = JSON.parse(response.body)
       { access_token: output['access_token'], refresh_token: output['refresh_token'],
-        expires_at: (Time.current + output.fetch('expires_in', 3600).to_i) }
+        expires_at: (Time.now + output.fetch('expires_in', 3600).to_i) }
     end
 
     def client

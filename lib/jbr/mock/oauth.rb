@@ -13,7 +13,7 @@ module Jbr
     def self.post(_)
       raise Error, Jbr.mock.oauth_error if Jbr.mock.oauth_error
 
-      { access_token: 'mock-token', refresh_token: 'mock-token', expires_at: (Time.current + 3600) }
+      { access_token: 'mock-token', refresh_token: 'mock-token', expires_at: (Time.now + 3600) }
     end
   end
 end
