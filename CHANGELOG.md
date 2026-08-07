@@ -1,3 +1,13 @@
+## [Unreleased]
+
+- [Fix] Require nothing but the standard library: to_query, present?, pluck,
+  stringify_keys and Time.current were ActiveSupport calls the gemspec never declared,
+  so `require 'jbr'` raised outside Rails
+- [Fix] Client#create no longer raises when Jobber answers without clientProperties
+- [Feature] Test every line, with SimpleCov failing the suite below 100% coverage
+- [Change] Extract Jbr::Property from Jbr::Client
+- [Change] Remove the unused Jbr::Configuration class
+
 ## [1.2.0] - 2026-06-09
 
 - [New] Create a Property with a Request if needed

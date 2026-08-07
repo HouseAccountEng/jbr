@@ -28,5 +28,8 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - name: Lint code for consistent style
+        run: bundle exec rubocop -f github
+
       - name: Run the default task
         run: bundle exec rake
