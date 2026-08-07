@@ -5,8 +5,12 @@ class VisitsTest < Minitest::Test
     address = { 'street1' => '1 Main St', 'city' => 'Raleigh', 'province' => 'NC',
       'postalCode' => '27601', 'coordinates' => { 'latitude' => 35.77, 'longitude' => -78.63 },
     }
+    client = { 'id' => 'client-01', 'firstName' => 'Jane', 'lastName' => 'Doe',
+      'phone' => '5553335555', 'email' => 'jane@example.com',
+    }
     node = { 'id' => 'visit-01', 'title' => 'Tune-up', 'job' => { 'id' => 'job-01' },
-      'property' => { 'address' => address }, 'allDay' => true, 'clientConfirmed' => false,
+      'client' => client, 'property' => { 'id' => 'property-01', 'address' => address },
+      'allDay' => true, 'clientConfirmed' => false,
       'startAt' => '2026-08-09T14:00:00Z', 'endAt' => '2026-08-09T16:00:00Z',
     }
     stub_graphql 'visits' => { 'nodes' => [ node ], 'pageInfo' => { 'hasNextPage' => false } }
@@ -16,6 +20,10 @@ class VisitsTest < Minitest::Test
     assert_equal 'visit-01', visit.id
     assert_equal 'Tune-up', visit.title
     assert_equal 'job-01', visit.job_id
+    assert_equal 'property-01', visit.property_id
+    assert_equal({ id: 'client-01', first_name: 'Jane', last_name: 'Doe',
+                   phone: '5553335555', email: 'jane@example.com',
+    }, visit.client)
     assert_equal({ street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601',
                    latitude: 35.77, longitude: -78.63,
     }, visit.address)
@@ -25,11 +33,15 @@ class VisitsTest < Minitest::Test
     refute visit.client_confirmed?
   end
 
-  def test_a_visit_with_no_property_has_no_address
-    node = { 'id' => 'visit-01', 'property' => nil }
+  def test_a_visit_with_no_property_or_client_carries_neither
+    node = { 'id' => 'visit-01', 'property' => nil, 'client' => nil }
     stub_graphql 'visits' => { 'nodes' => [ node ], 'pageInfo' => { 'hasNextPage' => false } }
 
-    assert_empty oauth.visits.upcoming.first.address
+    visit = oauth.visits.upcoming.first
+
+    assert_empty visit.address
+    assert_empty visit.client
+    assert_nil visit.property_id
   end
 
   def test_an_unscheduled_visit_has_no_job_and_no_times

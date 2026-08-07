@@ -15,6 +15,10 @@ module Jbr
 
     def job_id = @node[:job_id]
 
+    def property_id = @node[:property_id]
+
+    def client = @node.fetch :client, {}
+
     def address = @node.fetch :address, {}
 
     def all_day? = @node[:all_day]

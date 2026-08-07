@@ -1,6 +1,11 @@
 module Jbr
   # One stop at a property: when the work on a job is scheduled to happen.
   class Visit < Resource
+    # What Jobber calls each field of the client the work is for, against what a caller reads.
+    CLIENT_FIELDS = { id: :id, firstName: :first_name, lastName: :last_name,
+      phone: :phone, email: :email,
+    }
+
     # The query that reads a page of visits starting after a moment, oldest first. Forty a
     # page, not a hundred: Jobber prices a query by its page size and refuses the wider one.
     UPCOMING = <<~GRAPHQL
@@ -9,7 +14,8 @@ module Jbr
           nodes {
             id title startAt endAt allDay clientConfirmed
             job { id }
-            property { address { #{Property::SELECTION} } }
+            client { #{CLIENT_FIELDS.keys.join ' '} }
+            property { id address { #{Property::SELECTION} } }
           }
           pageInfo { hasNextPage endCursor }
         }
@@ -46,6 +52,15 @@ module Jbr
 
     # @return [Boolean, nil] whether the client has confirmed the visit.
     def client_confirmed? = @node['clientConfirmed']
+
+    # @return [String, nil] the ID of the property the work happens at.
+    def property_id = @node.dig 'property', 'id'
+
+    # Who the work is for, in the fields a client is created with.
+    # @return [Hash] any of :id, :first_name, :last_name, :phone and :email.
+    def client
+      CLIENT_FIELDS.to_h { |jobber, ours| [ ours, @node.dig('client', jobber.to_s) ] }.compact
+    end
 
     # Where the work happens, in the fields {Property} carries.
     # @return [Hash] any of :street, :city, :state, :zip, :latitude and :longitude.

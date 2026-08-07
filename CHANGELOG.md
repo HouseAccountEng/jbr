@@ -1,3 +1,9 @@
+## [2.2.0] - 2026-08-07
+
+- [New] Carry the client a visit is for -- id, first name, last name, phone and email --
+  and the ID of the property it happens at, so an app can file a visit against the people
+  and places it already knows
+
 ## [2.1.0] - 2026-08-07
 
 - [New] Fetch the visits an account has scheduled from now on, with oauth.visits.upcoming.

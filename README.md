@@ -98,6 +98,9 @@ visit = visits.first
 visit.id # => 'Z2lkOi8vS'
 visit.title # => 'Furnace tune-up'
 visit.job_id # => 'Z2lkOi8vS'
+visit.property_id # => 'Z2lkOi8vS'
+visit.client # => { id: 'Z2lkOi8vS', first_name: 'Jane', last_name: 'Doe',
+             #      phone: '5553335555', email: 'jane@example.com' }
 visit.address # => { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601',
               #      latitude: 35.77, longitude: -78.63 }
 visit.starts_at # => 2026-08-09 14:00:00
@@ -171,6 +174,7 @@ Mock successfully fetching upcoming visits:
 
 ```ruby
 Jbr.mock.visits = [ { id: 'visit-01', title: 'Furnace tune-up', job_id: 'job-01',
+  property_id: 'property-01', client: { id: 'client-01', first_name: 'Jane' },
   address: { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601' },
   starts_at: Date.tomorrow.noon, ends_at: Date.tomorrow.end_of_day,
   all_day: false, client_confirmed: true } ]
