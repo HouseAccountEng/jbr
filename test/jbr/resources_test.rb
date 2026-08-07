@@ -28,7 +28,8 @@ class ResourcesTest < Minitest::Test
   def test_a_job_carries_its_quote_and_its_times
     stub_graphql 'job' => { 'id' => 'job-01', 'quote' => { 'id' => 'quote-01' },
                             'startAt' => '2026-05-14T23:02:52Z',
-                            'completedAt' => '2026-05-18T11:36:13Z' }
+                            'completedAt' => '2026-05-18T11:36:13Z',
+    }
 
     job = oauth.jobs.find 'job-01'
 
@@ -56,7 +57,9 @@ class ResourcesTest < Minitest::Test
     stub_graphql 'invoice' => { 'id' => 'invoice-01', 'total' => '40.30',
                                 'invoiceStatus' => 'sent', 'issuedDate' => '2026-05-22T12:12:53Z',
                                 'jobs' => { 'nodes' => [ { 'id' => 'job-01',
-                                                           'completedAt' => '2026-05-22T14:32:53Z' } ] } }
+                                                           'completedAt' => '2026-05-22T14:32:53Z',
+                                } ] },
+    }
 
     invoice = oauth.invoices.find 'invoice-01'
 
@@ -68,7 +71,8 @@ class ResourcesTest < Minitest::Test
 
   def test_an_invoice_with_no_job_has_no_dates
     stub_graphql 'invoice' => { 'id' => 'invoice-01', 'invoiceStatus' => 'sent',
-                                'issuedDate' => nil, 'jobs' => { 'nodes' => [] } }
+                                'issuedDate' => nil, 'jobs' => { 'nodes' => [] },
+    }
 
     invoice = oauth.invoices.find 'invoice-01'
 

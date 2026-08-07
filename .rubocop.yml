@@ -1,0 +1,59 @@
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+# The omakase base disables whole departments and re-enables a chosen subset, so
+# every cop it does not name needs an explicit 'Enabled: true' below.
+
+AllCops:
+  # Adopt every cop a new release brings, rather than pinning to today's set
+  NewCops: enable
+  # An extension we decline is declined in this file, not merely ignored
+  SuggestExtensions: false
+
+# We never freeze a string, so the magic comment has nothing to say
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: never
+
+# The cop demands '.freeze' on string constants and cannot skip them
+Style/MutableConstant:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+  IndentOneStep: true
+
+# 'private' sits at the level of 'class', so it reads as a divider
+Layout/AccessModifierIndentation:
+  Enabled: true
+  EnforcedStyle: outdent
+
+# One 'include' statement carries the list, split only when it will not fit
+Style/MixinGrouping:
+  Enabled: true
+  EnforcedStyle: grouped
+
+Layout/LineLength:
+  Enabled: true
+  Max: 100
+
+# Omit parentheses on a call's arguments, keeping the inner ones parsing needs -- except
+# where the call IS the condition, after 'if', 'unless', 'while', 'until' or in a ternary,
+# which keeps them so the reader sees where the argument ends and the branch begins.
+# 'omit_parentheses' has no option for that exception and an inline disable costs three
+# lines per site, so the cop is declined and the rule held in review.
+Style/MethodCallWithArgsParentheses:
+  Enabled: false

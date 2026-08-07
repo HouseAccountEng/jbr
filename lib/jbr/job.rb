@@ -1,6 +1,6 @@
 module Jbr
   class Job < Resource
-    FIND = <<~GRAPHQL.freeze
+    FIND = <<~GRAPHQL
       query($id: EncodedId!) {
         job(id: $id) { id quote { id } startAt completedAt }
       }

@@ -1,6 +1,6 @@
 module Jbr
   class Request < Resource
-    CREATE = <<~GRAPHQL.freeze
+    CREATE = <<~GRAPHQL
       mutation($input: RequestCreateInput!) {
         requestCreate(input: $input) { request { id property { id } } userErrors { message } }
       }
@@ -24,7 +24,7 @@ module Jbr
 
       input = {
         clientId: @client_id, title: params[:title], propertyId: @property_id,
-        assessment: { instructions: params[:instructions] }
+        assessment: { instructions: params[:instructions] },
       }
       output = @oauth.query CREATE, variables: { input: input }
       @id = output.dig 'requestCreate', 'request', 'id'

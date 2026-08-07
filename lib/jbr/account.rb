@@ -1,6 +1,6 @@
 module Jbr
   class Account < Resource
-    FIND = <<~GRAPHQL.freeze
+    FIND = <<~GRAPHQL
       { account { id } }
     GRAPHQL
 

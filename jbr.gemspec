@@ -1,12 +1,10 @@
-# frozen_string_literal: true
-
 require_relative 'lib/jbr/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'jbr'
   spec.version = Jbr::VERSION
-  spec.authors = ['Claudio Baccigalupo']
-  spec.email = ['claudiob@users.noreply.github.com']
+  spec.authors = [ 'Claudio Baccigalupo' ]
+  spec.email = [ 'claudiob@users.noreply.github.com' ]
 
   spec.summary = 'A Ruby client for the Jobber API.'
   spec.description = 'Jobber API'
@@ -29,10 +27,11 @@ Gem::Specification.new do |spec|
   end
   spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ['lib']
+  spec.require_paths = [ 'lib' ]
 
   spec.add_development_dependency 'minitest' # to run the test suite
   spec.add_development_dependency 'rake' # to run 'bundle exec rake'
+  spec.add_development_dependency 'rubocop-rails-omakase' # to run 'bundle exec rubocop'
   spec.add_development_dependency 'simplecov' # to fail the suite below 100% coverage
   spec.add_development_dependency 'webmock' # to answer Jobber without a network
 end

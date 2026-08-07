@@ -1,6 +1,6 @@
 module Jbr
   class Client < Resource
-    LOOKUP = <<~GRAPHQL.freeze
+    LOOKUP = <<~GRAPHQL
       query($searchTerm: String!) {
         clientPhones(first: 1, searchTerm: $searchTerm) { nodes {
           client { id updatedAt clientProperties { nodes { id address { street city province postalCode } }} }
@@ -8,7 +8,7 @@ module Jbr
       }
     GRAPHQL
 
-    CREATE = <<~GRAPHQL.freeze
+    CREATE = <<~GRAPHQL
       mutation($input: ClientCreateInput!) {
         clientCreate(input: $input) {
           client { id clientProperties(first: 1) { nodes { id } } }
@@ -17,7 +17,7 @@ module Jbr
       }
     GRAPHQL
 
-    CREATE_PROPERTY = <<~GRAPHQL.freeze
+    CREATE_PROPERTY = <<~GRAPHQL
       mutation propertyCreateMutation($clientId: EncodedId!, $input: PropertyCreateInput!) {
         propertyCreate(clientId: $clientId, input: $input) {
           properties { id }
@@ -62,7 +62,10 @@ module Jbr
       @property_id = if existing_property
         existing_property['id']
       else
-        property = @oauth.query CREATE_PROPERTY, variables: { clientId: @id, input: { properties: [ { address: extract_address_from(@create_params[:address]) }] } }
+        property = @oauth.query CREATE_PROPERTY,
+variables: { clientId: @id,
+input: { properties: [ { address: extract_address_from(@create_params[:address]) } ] },
+}
         (property&.dig('propertyCreate', 'properties')&.first || {})['id']
       end
       true
@@ -77,11 +80,12 @@ module Jbr
     end
 
     def input
+      address, email = @create_params[:address], @create_params[:email]
       { firstName: @create_params[:first_name],
         lastName: @create_params[:last_name],
-        properties: ([{ address: extract_address_from(@create_params[:address]) }] if present?(@create_params[:address])),
-        phones: [{ number: @create_params[:phone], primary: true }],
-        emails: ([{ address: @create_params[:email], primary: true }] if present?(@create_params[:email]))
+        properties: ([ { address: extract_address_from(address) } ] if present?(address)),
+        phones: [ { number: @create_params[:phone], primary: true } ],
+        emails: ([ { address: email, primary: true } ] if present?(email)),
       }.compact
     end
 
@@ -90,7 +94,7 @@ module Jbr
     def extract_address_from(fields = {})
       {
         street1: fields[:street], city: fields[:city],
-        province: fields[:state], postalCode: fields[:zip]
+        province: fields[:state], postalCode: fields[:zip],
       }.compact
     end
   end

@@ -1,6 +1,6 @@
 module Jbr
   class Quote < Resource
-    FIND = <<~GRAPHQL.freeze
+    FIND = <<~GRAPHQL
       query($id: EncodedId!) {
         quote(id: $id) { id request { id } }
       }

@@ -7,7 +7,8 @@ class URLTest < Minitest::Test
     assert_equal 'api.getjobber.com', url.host
     assert_equal '/api/oauth/authorize', url.path
     assert_equal({ 'redirect_uri' => 'https://example.com/callback', 'state' => 'abc',
-                   'response_type' => 'code', 'client_id' => 'client-id' },
+                   'response_type' => 'code', 'client_id' => 'client-id',
+    },
                  URI.decode_www_form(url.query).to_h)
   end
 end

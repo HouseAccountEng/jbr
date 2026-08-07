@@ -1,6 +1,6 @@
 module Jbr
   class Invoice < Resource
-    FIND = <<~GRAPHQL.freeze
+    FIND = <<~GRAPHQL
       query($id: EncodedId!) {
         invoice(id: $id) { id total invoiceStatus issuedDate
           jobs { nodes { id completedAt } } }
