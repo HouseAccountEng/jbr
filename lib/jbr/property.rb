@@ -14,6 +14,10 @@ module Jbr
     # What Jobber calls each address field, against what a caller passes.
     FIELDS = { street1: :street, city: :city, province: :state, postalCode: :zip }
 
+    # The fields a match is made on. The state is written but never matched: Jobber
+    # takes it as either "North Carolina" or "NC", and the ZIP already places the home.
+    MATCHED = %i[street1 city postalCode]
+
     # The address as Jobber takes it, from the fields a caller passes.
     # @param fields [Hash] any of :street, :city, :state and :zip.
     # @return [Hash] the address, without the fields the caller left out.
@@ -41,10 +45,10 @@ module Jbr
 
     # Field by field, because Jobber answers every field it was asked for, nil included,
     # while a caller's address carries only what they had -- an absent field and a nil
-    # one are the same address. Every field has to agree: a home with no street parsed
-    # must not match the one house on the client's file that does have one.
+    # one are the same address. All of {MATCHED} has to agree: a home with no street
+    # parsed must not match the one house on the client's file that does have one.
     def same_address?(wanted, address)
-      FIELDS.each_key.all? { |field| wanted[field] == (address || {})[field.to_s] }
+      MATCHED.all? { |field| wanted[field] == (address || {})[field.to_s] }
     end
   end
 end

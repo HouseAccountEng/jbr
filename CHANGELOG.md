@@ -5,7 +5,8 @@
   so `require 'jbr'` raised outside Rails
 - [Fix] Reuse the property already on a client's file instead of adding a duplicate on
   every request: the lookup read the address as `street`, while the comparison built it
-  as `street1`, so it never matched
+  as `street1`, so it never matched. The match is made on street, city and ZIP; the
+  state is written but not matched, since Jobber takes either "North Carolina" or "NC"
 - [Fix] Client#create no longer raises when Jobber answers without clientProperties
 - [Feature] Test every line, with SimpleCov failing the suite below 100% coverage
 - [Change] Extract Jbr::Property from Jbr::Client
