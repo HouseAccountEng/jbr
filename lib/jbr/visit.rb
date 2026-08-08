@@ -51,9 +51,6 @@ module Jbr
     # @return [Boolean, nil] whether the client has confirmed the visit.
     def client_confirmed? = @node['clientConfirmed']
 
-    # @return [String, nil] the ID of the property the work happens at.
-    def property_id = @node.dig 'property', 'id'
-
     # Who the work is for, in the fields a client is created with.
     # @return [Hash] any of :id, :first_name, :last_name, :phone and :email.
     def client
@@ -61,9 +58,13 @@ module Jbr
       fields.merge(phone: Phone.from(@node.dig('client', 'phones'))).compact
     end
 
-    # Where the work happens, in the fields {Property} carries.
-    # @return [Hash] any of :street, :city, :state, :zip, :latitude and :longitude.
-    def address = Property.fields_from @node.dig('property', 'address')
+    # Where the work happens, in the fields {Property} carries, under the ID Jobber files
+    # it by -- the shape {#client} answers in, so both read the same way.
+    # @return [Hash] any of :id, :street, :city, :state, :zip, :latitude and :longitude.
+    def property
+      fields = Property.fields_from @node.dig('property', 'address')
+      { id: @node.dig('property', 'id') }.merge fields
+    end
 
     # @return [Time, nil] the visit start time
     def starts_at

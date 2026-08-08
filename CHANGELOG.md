@@ -1,3 +1,9 @@
+## [2.4.0] - 2026-08-08
+
+- [Breaking change] A visit answers `property` -- the ID Jobber files the place under, beside
+  the address fields -- rather than `property_id` and `address` apart. It reads the way
+  `client` already did, so a caller unpacks both the same way
+
 ## [2.3.0] - 2026-08-07
 
 - [Breaking change] A client's phone is the number Jobber holds as reachable rather than

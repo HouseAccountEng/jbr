@@ -74,9 +74,10 @@ class MockTest < Minitest::Test
   def test_visits_are_whatever_the_app_asked_for
     starts_at = Time.utc 2026, 8, 9
     Jbr.mock.visits = [ { id: 'visit-01', title: 'Tune-up', job_id: 'job-01',
-                          starts_at: starts_at, address: { street: '1 Main St' },
+                          starts_at: starts_at,
                           all_day: true, client_confirmed: false,
-                          property_id: 'property-01', client: { id: 'client-01' },
+                          property: { id: 'property-01', street: '1 Main St' },
+                          client: { id: 'client-01' },
     } ]
 
     visit = credentials.visits.upcoming.first
@@ -84,8 +85,7 @@ class MockTest < Minitest::Test
     assert_equal 'visit-01', visit.id
     assert_equal 'Tune-up', visit.title
     assert_equal 'job-01', visit.job_id
-    assert_equal({ street: '1 Main St' }, visit.address)
-    assert_equal 'property-01', visit.property_id
+    assert_equal({ id: 'property-01', street: '1 Main St' }, visit.property)
     assert_equal({ id: 'client-01' }, visit.client)
     assert visit.all_day?
     refute visit.client_confirmed?

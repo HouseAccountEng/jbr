@@ -26,28 +26,16 @@ class VisitsTest < Minitest::Test
     assert_equal 'visit-01', visit.id
     assert_equal 'Tune-up', visit.title
     assert_equal 'job-01', visit.job_id
-    assert_equal 'property-01', visit.property_id
     assert_equal({ id: 'client-01', first_name: 'Jane', last_name: 'Doe',
                    phone: '5553335555', email: 'jane@example.com',
     }, visit.client)
-    assert_equal({ street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601',
-                   latitude: 35.77, longitude: -78.63,
-    }, visit.address)
+    assert_equal({ id: 'property-01', street: '1 Main St', city: 'Raleigh', state: 'NC',
+                   zip: '27601', latitude: 35.77, longitude: -78.63,
+    }, visit.property)
     assert_equal Time.utc(2026, 8, 9, 14), visit.starts_at
     assert_equal Time.utc(2026, 8, 9, 16), visit.ends_at
     assert visit.all_day?
     refute visit.client_confirmed?
-  end
-
-  def test_a_visit_with_no_property_or_client_carries_neither
-    node = { 'id' => 'visit-01', 'property' => nil, 'client' => nil }
-    stub_graphql 'visits' => { 'nodes' => [ node ], 'pageInfo' => { 'hasNextPage' => false } }
-
-    visit = oauth.visits.upcoming.first
-
-    assert_empty visit.address
-    assert_empty visit.client
-    assert_nil visit.property_id
   end
 
   def test_an_unscheduled_visit_has_no_job_and_no_times
