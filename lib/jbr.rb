@@ -21,6 +21,7 @@ require 'jbr/phone'
 require 'jbr/cliental'
 require 'jbr/named'
 require 'jbr/resource'
+require 'jbr/throttle'
 require 'jbr/request'
 require 'jbr/oauth'
 

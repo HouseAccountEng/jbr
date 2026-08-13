@@ -16,6 +16,7 @@ module GraphQL
 
     # @param query [String] the GraphQL query string.
     # @param variables [Hash] the variables to interpolate into the query.
+    # @yield [Hash] the `extensions` the endpoint answered beside the data, where it did.
     # @return [Hash] the `data` portion of the GraphQL response.
     def query(query, variables: {})
       response = Net::HTTP.post @endpoint, { query:, variables: }.to_json, request_headers
@@ -24,6 +25,7 @@ module GraphQL
       body = JSON.parse(response.body)
       errors = body['errors']
       raise Error, errors.map { |error| error['message'] }.join('; ') if errors.present?
+      yield body['extensions'] if block_given?
       body.fetch('data')
     end
 

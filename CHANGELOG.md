@@ -1,3 +1,13 @@
+## [3.2.0] - 2026-08-13
+
+- [New] Wait rather than be refused. Jobber holds an app to two limits at once -- 2,500
+  requests every five minutes, and a bucket of query cost that drains as it is asked --
+  and a walk of many pages could reach either. Every request now spaces itself 0.12s from
+  the one before, which is the count spread evenly over the window, and reads the bucket
+  Jobber reports beside the data to wait longer where the next page cannot be paid for.
+  A request that follows no other waits for nothing, so a single lookup is as quick as it
+  was: only a walk long enough to be a problem is slowed, and only as much as it must be
+
 ## [3.1.0] - 2026-08-13
 
 - [Fix] An answer Jobber left empty now reads as no answer rather than as an empty string.

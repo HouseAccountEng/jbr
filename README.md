@@ -76,7 +76,8 @@ job.completed_at # => 2026-05-18 11:36:13
 
 Or walk the account's jobs, oldest first. Jobber is asked for a page at a time, and only
 once the page before it runs out, so `first` costs one request where `to_a` costs as many
-as the account has pages:
+as the account has pages. A walk paces itself, so a long one is never refused: see
+[Rate limits](#rate-limits).
 
 ```ruby
 jobs = oauth.jobs # => an Enumerable of every job, nothing fetched yet
@@ -153,6 +154,20 @@ visit.property.client.name # => whoever the place sits on the file of
 
 Ask for nothing and nothing arrives: `oauth.visits.first.client.name` is nil where the
 query never named a client.
+
+### Rate limits
+
+Jobber holds an app to two limits at once: 2,500 requests every five minutes, and a bucket
+of query cost that drains as it is asked and refills at a rate it reports. Nothing has to be
+done about either — every request waits for itself:
+
+- It spaces itself 0.12 seconds from the request before, which is 2,500 spread evenly over
+  five minutes.
+- It reads `extensions.cost` off each answer, and where the bucket can no longer pay for a
+  page like the last one, it waits for the shortfall to refill at Jobber's own restore rate.
+
+A request that follows no other waits for nothing, so a single `find` is as quick as it ever
+was. Only a walk long enough to be a problem is slowed, and only by as much as it must be.
 
 ### Events
 

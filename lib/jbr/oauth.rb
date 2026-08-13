@@ -34,12 +34,11 @@ module Jbr
     def requests = Request.new oauth: self
     def visits = Visits.new oauth: self
 
-    # Run a statement, refreshing the access token once if Jobber says it expired.
-    # @param statement [String] the query or mutation to run.
-    # @param variables [Hash] the variables it interpolates.
+    # Run a statement, waiting for what Jobber will still answer and refreshing a stale token.
     # @return [Hash] the data Jobber answered, or empty when the credentials are dead.
     def query(statement, variables: {})
-      client.query statement, variables: variables
+      throttle.wait
+      client.query(statement, variables: variables) { |extensions| throttle.read extensions }
     rescue GraphQL::Unauthorized
       refresh ? retry : {}
     end
@@ -65,8 +64,7 @@ module Jbr
     # @return [String, nil] The client secret to interact with the API.
     def self.client_secret = ENV['JOBBER_CLIENT_SECRET']
 
-    # Exchange a code or a refresh token for credentials. Public because #refresh
-    # reaches it through self.class, which a private class method forbids.
+    # Exchange a code or a refresh token for credentials.
     def self.post(params = {})
       uri = URI 'https://api.getjobber.com/api/oauth/token'
       response = Net::HTTP.post_form uri,
@@ -79,6 +77,8 @@ module Jbr
     end
 
   private
+
+    def throttle = @throttle ||= Throttle.new
 
     def refresh
       output = self.class.post refresh_token: @refresh_token, grant_type: 'refresh_token'
