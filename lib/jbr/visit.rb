@@ -1,43 +1,7 @@
 module Jbr
   # One stop at a property: when the work on a job is scheduled to happen.
   class Visit < Resource
-    # What Jobber calls each field of the client the work is for, against what a caller reads.
-    CLIENT_FIELDS = { id: :id, firstName: :first_name, lastName: :last_name, email: :email }
-
-    # The query that reads a page of visits starting after a moment, oldest first. Forty a
-    # page, not a hundred: Jobber prices a query by its page size and refuses the wider one.
-    UPCOMING = <<~GRAPHQL
-      query($after: String, $from: ISO8601DateTime!) {
-        visits(first: 40, after: $after, filter: { startAt: { after: $from } }) {
-          nodes {
-            id title startAt endAt allDay clientConfirmed
-            job { id }
-            client { #{CLIENT_FIELDS.keys.join ' '} #{Phone::SELECTION} }
-            property { id address { #{Property::SELECTION} } }
-          }
-          pageInfo { hasNextPage endCursor }
-        }
-      }
-    GRAPHQL
-
-    # @param oauth [OAuth] the credentials to reach Jobber with.
-    # @param node [Hash] the visit as Jobber answered it.
-    def initialize(oauth:, node: {})
-      super oauth: oauth
-      @node = node
-    end
-
-    # The visits scheduled from now on, oldest first. Nothing is read until the enumerator
-    # is walked, and a page is read only once the one before it runs out.
-    # @return [Enumerator<Visit>] the account's upcoming visits.
-    def upcoming
-      Enumerator.new do |yielder|
-        nodes.each { |node| yielder << self.class.new(oauth: @oauth, node: node) }
-      end
-    end
-
-    # @return [String, nil] the Jobber ID of the visit.
-    def id = @node['id']
+    include Cliental, Properted
 
     # @return [String, nil] what the visit is called.
     def title = @node['title']
@@ -51,46 +15,10 @@ module Jbr
     # @return [Boolean, nil] whether the client has confirmed the visit.
     def client_confirmed? = @node['clientConfirmed']
 
-    # Who the work is for, in the fields a client is created with.
-    # @return [Hash] any of :id, :first_name, :last_name, :phone and :email.
-    def client
-      fields = CLIENT_FIELDS.to_h { |jobber, ours| [ ours, @node.dig('client', jobber.to_s) ] }
-      fields.merge(phone: Phone.from(@node.dig('client', 'phones'))).compact
-    end
-
-    # Where the work happens, in the fields {Property} carries, under the ID Jobber files
-    # it by -- the shape {#client} answers in, so both read the same way.
-    # @return [Hash] any of :id, :street, :city, :state, :zip, :latitude and :longitude.
-    def property
-      fields = Property.fields_from @node.dig('property', 'address')
-      { id: @node.dig('property', 'id') }.merge fields
-    end
-
     # @return [Time, nil] the visit start time
-    def starts_at
-      Time.iso8601(@node['startAt']) if @node['startAt']
-    end
+    def starts_at = time 'startAt'
 
     # @return [Time, nil] the visit end time
-    def ends_at
-      Time.iso8601(@node['endAt']) if @node['endAt']
-    end
-
-  private
-
-    # The moment is stamped once, before the first page: read per page, it would slide
-    # forward and drop a visit that started while the pages were being walked.
-    def nodes
-      Enumerator.new do |yielder|
-        from, after = Time.now.iso8601, nil
-        loop do
-          page = @oauth.query(UPCOMING, variables: { after: after, from: from }).fetch 'visits', {}
-          page.fetch('nodes', []).each { |node| yielder << node }
-          break unless page.dig 'pageInfo', 'hasNextPage'
-
-          after = page.dig 'pageInfo', 'endCursor'
-        end
-      end
-    end
+    def ends_at = time 'endAt'
   end
 end

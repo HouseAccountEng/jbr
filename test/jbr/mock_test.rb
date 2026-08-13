@@ -71,28 +71,6 @@ class MockTest < Minitest::Test
     assert_nil invoice.completed_at
   end
 
-  def test_visits_are_whatever_the_app_asked_for
-    starts_at = Time.utc 2026, 8, 9
-    Jbr.mock.visits = [ { id: 'visit-01', title: 'Tune-up', job_id: 'job-01',
-                          starts_at: starts_at,
-                          all_day: true, client_confirmed: false,
-                          property: { id: 'property-01', street: '1 Main St' },
-                          client: { id: 'client-01' },
-    } ]
-
-    visit = credentials.visits.upcoming.first
-
-    assert_equal 'visit-01', visit.id
-    assert_equal 'Tune-up', visit.title
-    assert_equal 'job-01', visit.job_id
-    assert_equal({ id: 'property-01', street: '1 Main St' }, visit.property)
-    assert_equal({ id: 'client-01' }, visit.client)
-    assert visit.all_day?
-    refute visit.client_confirmed?
-    assert_equal starts_at, visit.starts_at
-    assert_nil visit.ends_at
-  end
-
 private
 
   def credentials = Jbr.oauth_for access_token: 'mock-token'

@@ -1,37 +1,37 @@
 module Jbr
   # Work a Jobber user accepted and scheduled.
   class Job < Resource
-    # The query that reads one job, its quote and its two timestamps.
-    FIND = <<~GRAPHQL
-      query($id: EncodedId!) {
-        job(id: $id) { id quote { id } startAt completedAt }
-      }
-    GRAPHQL
+    include Cliental, Properted
+
+    # @return [String, nil] what the job is called, where whoever opened it named it.
+    def title = @node['title']
+
+    # A job goes untitled often enough, and something has to stand in for it on a list.
+    # @return [String] the title, or the ID Jobber files the job under.
+    def name = title || id
+
+    # @return [String, nil] what the work is, in the words whoever opened the job wrote.
+    def instructions = @node['instructions']
+
+    # @return [String, nil] where Jobber files the job in its own workflow.
+    def status = @node['jobStatus']
 
     # @return [String, nil] the ID of the quote the job was won with.
-    attr_reader :quote_id
+    def quote_id = @node.dig 'quote', 'id'
 
-    # @param id [String] the Jobber ID of the job.
-    # @return [Job, nil] itself, or nil when Jobber has no such job.
-    def find(id)
-      output = @oauth.query FIND, variables: { id: id  }
-      return unless job = output['job']
+    # @return [Float, nil] what the job comes to.
+    def total = @node['total']
 
-      @id = job['id']
-      @quote_id = job.dig 'quote', 'id'
-      @scheduled_at = job['startAt']
-      @completed_at = job['completedAt']
-      self
-    end
+    # @return [Float, nil] what the quote the job was won with came to.
+    def quote_total = @node.dig 'quote', 'amounts', 'total'
 
-    # @return [Time] the job scheduled time
-    def scheduled_at
-      Time.iso8601(@scheduled_at) if @scheduled_at
-    end
+    # @return [Time, nil] the job opening time
+    def created_at = time 'createdAt'
 
-    # @return [Time] the job completed time
-    def completed_at
-      Time.iso8601(@completed_at) if @completed_at
-    end
+    # @return [Time, nil] the job scheduled time
+    def scheduled_at = time 'startAt'
+
+    # @return [Time, nil] the job completed time
+    def completed_at = time 'completedAt'
   end
 end

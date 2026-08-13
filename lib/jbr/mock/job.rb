@@ -1,17 +1,29 @@
 module Jbr
   # A job that reads from {Jbr.mock} instead of Jobber.
   class Mock::Job < Job
-    # @return [Mock::Job] itself, carrying the mocked IDs.
-    def find(_)
-      @id = Jbr.mock.job[:id]
-      @quote_id = Jbr.mock.job[:quote_id]
+    # @return [Object, nil] the values the app asked for.
+    def id = @node[:id]
 
-      self
-    end
+    def title = @node[:title]
 
-    # @return [Time, nil] the times the app asked for.
-    def scheduled_at = Jbr.mock.job[:scheduled_at]
+    def instructions = @node[:instructions]
 
-    def completed_at = Jbr.mock.job[:completed_at]
+    def status = @node[:status]
+
+    def quote_id = @node[:quote_id]
+
+    def total = @node[:total]
+
+    def quote_total = @node[:quote_total]
+
+    def created_at = @node[:created_at]
+
+    def client = Mock::Client.new(node: @node.fetch(:client, {}))
+
+    def property = Mock::Property.new(node: @node.fetch(:property, {}))
+
+    def scheduled_at = @node[:scheduled_at]
+
+    def completed_at = @node[:completed_at]
   end
 end

@@ -1,6 +1,8 @@
 module Jbr
   # Where the work happens: one address on a client's file.
   class Property < Resource
+    include Cliental
+
     # The mutation that adds a property to a client already on file.
     CREATE = <<~GRAPHQL
       mutation propertyCreateMutation($clientId: EncodedId!, $input: PropertyCreateInput!) {
@@ -19,6 +21,19 @@ module Jbr
 
     # The address as Jobber answers it, asked for wherever a property is read.
     SELECTION = "#{FIELDS.keys.join ' '} coordinates { #{COORDINATES.join ' '} }"
+
+    # Where the place is, in the fields a caller passes to open one.
+    # @return [Hash] any of :street, :city, :state, :zip, :latitude and :longitude.
+    def address = Property.fields_from @node['address']
+
+    # @return [String, nil] the street the work happens on.
+    def street = address[:street]
+
+    # @return [String, nil] the town the work happens in.
+    def city = address[:city]
+
+    # @return [String, nil] the postal code the work happens in.
+    def zip = address[:zip]
 
     # The fields a match is made on. City and state are written but never matched:
     # Jobber holds whatever was typed, so "NC" and "North Carolina" -- or "Winston Salem"

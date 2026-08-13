@@ -1,3 +1,28 @@
+## [3.0.0] - 2026-08-13
+
+- [Breaking change] `oauth.visits` and `oauth.jobs` answer the whole collection rather than
+  one record: each is an Enumerable of every visit or job on the account, oldest first, read
+  a page at a time only as far as it is walked. `oauth.visits.upcoming` still answers the
+  ones dated from now on, `.past` answers the ones dated before now, and both split the
+  schedule at the moment they are asked rather than per page, so nothing crosses the
+  boundary unseen. `oauth.jobs.find(id)` is unchanged
+- [Breaking change] A visit or a job answers `client` and `property` as objects rather than
+  hashes: `visit.client.phone` and `visit.property.street` where `visit.client[:phone]` and
+  `visit.property[:street]` used to read. A property answers `client` too, so the person a
+  place sits on the file of comes back with the place
+- [Breaking change] Nothing nested is fetched unless it is asked for. Chain `includes` the
+  way Active Record does -- `oauth.visits.includes(:client, property: :client)` -- and only
+  what it names is added to the query. Jobber prices a query by what it brings back, so a
+  caller who wants the visit alone is no longer charged for the client and the place
+- [New] Fetch jobs the way visits are fetched. A job carries `name`, `title`,
+  `instructions`, `status`, `total`, `quote_id`, `quote_total`, `created_at`, `scheduled_at`
+  and `completed_at`, and its client and property come back with `includes`. `name` is the
+  title, or the ID Jobber files the job under where nobody titled it, so it is never nil
+- [New] A client answers `name`: their first name, or the name of the business where the
+  client is a business. Jobber files nobody without one or the other, so it is never nil.
+  `first_name`, `last_name`, `company_name`, `email` and `phone` read individually
+- [New] Mock the jobs an account has with `Jbr.mock.jobs`, beside `Jbr.mock.visits`
+
 ## [2.4.0] - 2026-08-08
 
 - [Breaking change] A visit answers `property` -- the ID Jobber files the place under, beside

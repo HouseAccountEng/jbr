@@ -29,10 +29,10 @@ module Jbr
     def account = Account.new oauth: self
     def clients = Client.new oauth: self
     def invoices = Invoice.new oauth: self
-    def jobs = Job.new oauth: self
+    def jobs = Jobs.new oauth: self
     def quotes = Quote.new oauth: self
     def requests = Request.new oauth: self
-    def visits = Visit.new oauth: self
+    def visits = Visits.new oauth: self
 
     # Run a statement, refreshing the access token once if Jobber says it expired.
     # @param statement [String] the query or mutation to run.

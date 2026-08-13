@@ -23,6 +23,25 @@ module Jbr
     # @return [String, nil] the property the work happens at.
     attr_reader :property_id
 
+    # @return [String, nil] what the client is called.
+    def first_name = @node['firstName']
+
+    def last_name = @node['lastName']
+
+    # @return [String, nil] the business the client is, where the client is a business.
+    def company_name = @node['companyName']
+
+    # Jobber files nobody without one name or the other, so there is always one to call them.
+    # @return [String] the person's first name, or the business's name.
+    def name = first_name || company_name
+
+    # @return [String, nil] the address to write to.
+    def email = @node['email']
+
+    # The number to reach them on, without its country code.
+    # @return [String, nil] ten digits, or nil where Jobber holds none we can dial.
+    def phone = Phone.from(@node['phones'])
+
     # Create a client instance with the provided attributes.
     # @return [Client] itself
     # @param params [Hash] the attributes of the client

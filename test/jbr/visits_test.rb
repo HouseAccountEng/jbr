@@ -2,9 +2,7 @@ require 'test_helper'
 
 class VisitsTest < Minitest::Test
   def test_a_visit_carries_its_job_its_address_and_its_times
-    address = { 'street1' => '1 Main St', 'city' => 'Raleigh', 'province' => 'NC',
-      'postalCode' => '27601', 'coordinates' => { 'latitude' => 35.77, 'longitude' => -78.63 },
-    }
+    address = { 'street1' => '1 Main St', 'postalCode' => '27601' }
     client = { 'id' => 'client-01', 'firstName' => 'Jane', 'lastName' => 'Doe',
       'email' => 'jane@example.com',
       'phones' => [ { 'normalizedPhoneNumber' => '+441632960001', 'primary' => true,
@@ -14,24 +12,29 @@ class VisitsTest < Minitest::Test
                     { 'normalizedPhoneNumber' => '+15554446666', 'primary' => false,
                       'smsAllowed' => false, }, ],
     }
+    owner = { 'id' => 'client-02', 'companyName' => 'Ada & Co' }
     node = { 'id' => 'visit-01', 'title' => 'Tune-up', 'job' => { 'id' => 'job-01' },
-      'client' => client, 'property' => { 'id' => 'property-01', 'address' => address },
+      'client' => client,
+      'property' => { 'id' => 'property-01', 'address' => address, 'client' => owner },
       'allDay' => true, 'clientConfirmed' => false,
       'startAt' => '2026-08-09T14:00:00Z', 'endAt' => '2026-08-09T16:00:00Z',
     }
     stub_graphql 'visits' => { 'nodes' => [ node ], 'pageInfo' => { 'hasNextPage' => false } }
 
-    visit = oauth.visits.upcoming.first
+    visit = oauth.visits.includes(:client, property: :client).upcoming.first
 
     assert_equal 'visit-01', visit.id
     assert_equal 'Tune-up', visit.title
     assert_equal 'job-01', visit.job_id
-    assert_equal({ id: 'client-01', first_name: 'Jane', last_name: 'Doe',
-                   phone: '5553335555', email: 'jane@example.com',
-    }, visit.client)
-    assert_equal({ id: 'property-01', street: '1 Main St', city: 'Raleigh', state: 'NC',
-                   zip: '27601', latitude: 35.77, longitude: -78.63,
-    }, visit.property)
+    assert_equal 'client-01', visit.client.id
+    assert_equal 'Jane', visit.client.first_name
+    assert_equal 'Jane', visit.client.name
+    assert_equal '5553335555', visit.client.phone
+    assert_equal 'property-01', visit.property.id
+    assert_equal '1 Main St', visit.property.street
+    assert_equal '27601', visit.property.zip
+    # The client on the property's file comes with it, a business named where a business is
+    assert_equal 'Ada & Co', visit.property.client.name
     assert_equal Time.utc(2026, 8, 9, 14), visit.starts_at
     assert_equal Time.utc(2026, 8, 9, 16), visit.ends_at
     assert visit.all_day?
@@ -42,11 +45,22 @@ class VisitsTest < Minitest::Test
     node = { 'id' => 'visit-01', 'startAt' => nil, 'endAt' => nil }
     stub_graphql 'visits' => { 'nodes' => [ node ], 'pageInfo' => { 'hasNextPage' => false } }
 
-    visit = oauth.visits.upcoming.first
+    visit = oauth.visits.includes(:client, property: :client).upcoming.first
 
     assert_nil visit.job_id
     assert_nil visit.starts_at
     assert_nil visit.ends_at
+  end
+
+  def test_every_visit_is_walked_when_nothing_is_filtered_for
+    stub_graphql 'visits' => { 'nodes' => [ { 'id' => 'visit-01' } ],
+                               'pageInfo' => { 'hasNextPage' => false },
+    }
+
+    assert_equal %w[visit-01], oauth.visits.map(&:id)
+    assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
+      JSON.parse(request.body).dig('variables', 'filter').nil?
+    end
   end
 
   def test_every_page_of_visits_is_read

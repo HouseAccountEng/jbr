@@ -63,7 +63,7 @@ quote.request_id # => 'Z2lkOi8vSm9iYmVyL'
 
 ### Jobs
 
-Fetch a job from Jobber:
+Fetch a job from Jobber by the ID it is filed under:
 
 ```ruby
 job = oauth.jobs.find 'Njc5MTk5'
@@ -71,6 +71,25 @@ job.id # => 'Z2lkOi8vS'
 job.quote_id # => 'Z2lkOi8vS'
 job.scheduled_at # => 2026-05-14 23:02:52
 job.completed_at # => 2026-05-18 11:36:13
+```
+
+Or walk the account's jobs, oldest first. Jobber is asked for a page at a time, and only
+once the page before it runs out, so `first` costs one request where `to_a` costs as many
+as the account has pages:
+
+```ruby
+jobs = oauth.jobs # => an Enumerable of every job, nothing fetched yet
+oauth.jobs.past # => an Enumerator of the ones dated before now
+oauth.jobs.upcoming # => an Enumerator of the ones dated from now on
+
+job = jobs.first
+job.name # => 'Furnace tune-up', or the job's ID where nobody titled it. Never nil
+job.title # => 'Furnace tune-up'
+job.instructions # => 'Ring the doorbell twice'
+job.status # => 'requires_invoicing'
+job.total # => 260.0
+job.quote_total # => 240.0
+job.created_at # => 2026-05-10 09:15:00
 ```
 
 ### Invoices
@@ -88,26 +107,49 @@ invoice.completed_at # => 2026-05-22 14:32:53
 
 ### Visits
 
-Fetch the visits scheduled from now on, oldest first. Jobber is asked for a page at a time,
-and only once the page before it runs out, so `first` costs one request where `to_a` costs
-as many as the account has pages:
+Walk the account's visits, oldest first, the same way as its jobs:
 
 ```ruby
-visits = oauth.visits.upcoming # => an Enumerator, nothing fetched yet
+visits = oauth.visits # => an Enumerable of every visit, nothing fetched yet
+oauth.visits.upcoming # => an Enumerator of the ones dated from now on
+oauth.visits.past # => an Enumerator of the ones dated before now
+
 visit = visits.first
 visit.id # => 'Z2lkOi8vS'
 visit.title # => 'Furnace tune-up'
 visit.job_id # => 'Z2lkOi8vS'
-visit.property # => { id: 'Z2lkOi8vS', street: '1 Main St', city: 'Raleigh',
-               #      state: 'NC', zip: '27601', latitude: 35.77, longitude: -78.63 }
-visit.client # => { id: 'Z2lkOi8vS', first_name: 'Jane', last_name: 'Doe',
-             #      phone: '5553335555', email: 'jane@example.com' }
-             # phone is the reachable North American number, ten digits, or nil
 visit.starts_at # => 2026-08-09 14:00:00
 visit.ends_at # => 2026-08-09 16:00:00
 visit.all_day? # => false
 visit.client_confirmed? # => true
 ```
+
+### Clients and properties
+
+Jobber prices a query by what it brings back, so nothing nested comes back unless it is
+asked for. Chain `includes` the way Active Record does, on visits or on jobs:
+
+```ruby
+visit = oauth.visits.includes(:client, property: :client).upcoming.first
+
+visit.client.name # => 'Jane', or the business's name where the client is a business
+visit.client.first_name # => 'Jane'
+visit.client.last_name # => 'Doe'
+visit.client.company_name # => nil
+visit.client.email # => 'jane@example.com'
+visit.client.phone # => '5553335555', the reachable North American number, or nil
+
+visit.property.id # => 'Z2lkOi8vS'
+visit.property.street # => '1 Main St'
+visit.property.city # => 'Raleigh'
+visit.property.zip # => '27601'
+visit.property.address # => { street: '1 Main St', city: 'Raleigh', state: 'NC',
+                       #      zip: '27601', latitude: 35.77, longitude: -78.63 }
+visit.property.client.name # => whoever the place sits on the file of
+```
+
+Ask for nothing and nothing arrives: `oauth.visits.first.client.name` is nil where the
+query never named a client.
 
 ### Events
 
@@ -162,21 +204,32 @@ Jbr.mock.quote = { id: 'quote-01', request_id: 'request-01' }
 
 ### Jobs
 
-Mock successfully fetching a job:
+Mock successfully fetching a job by ID:
 
 ```ruby
 Jbr.mock.job = { id: 'job-01', quote_id: 'quote-01', scheduled_at: Date.tomorrow.noon }
 ```
 
+Mock the jobs the account has. The mock dates nothing it was handed: what answers to
+`past` and to `upcoming` is whatever `scheduled_at` the app gave each one:
+
+```ruby
+Jbr.mock.jobs = [ { id: 'job-01', title: 'Furnace tune-up', status: 'archived',
+  total: 260.0, quote_total: 240.0, created_at: Date.yesterday.noon,
+  scheduled_at: Date.yesterday.noon, completed_at: Date.today.noon,
+  property: { id: 'property-01', street: '1 Main St',
+    client: { id: 'client-01', company_name: 'Acme Property Management' } } } ]
+```
+
 ### Visits
 
-Mock successfully fetching upcoming visits:
+Mock the visits the account has:
 
 ```ruby
 Jbr.mock.visits = [ { id: 'visit-01', title: 'Furnace tune-up', job_id: 'job-01',
-  property: { id: 'property-01', street: '1 Main St' },
+  property: { id: 'property-01', street: '1 Main St',
+    client: { id: 'client-01', first_name: 'Jane' } },
   client: { id: 'client-01', first_name: 'Jane' },
-  address: { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601' },
   starts_at: Date.tomorrow.noon, ends_at: Date.tomorrow.end_of_day,
   all_day: false, client_confirmed: true } ]
 ```
