@@ -15,6 +15,8 @@ require 'jbr/mock'
 
 require 'jbr/url'
 require 'jbr/error'
+require 'jbr/refused'
+require 'jbr/token'
 # Phone before Cliental, and Cliental before the records that include it: what each asks
 # Jobber for about a client is built as they load.
 require 'jbr/phone'

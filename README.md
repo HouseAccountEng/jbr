@@ -41,6 +41,16 @@ Revoke credentials:
 oauth.delete
 ```
 
+Credentials go bad only when Jobber says so. A refused refresh — the `invalid_grant` Jobber
+names — sets `invalid_at` and answers queries with nothing. Anything else that goes wrong,
+including a 500 or a rate limit, raises `Jbr::Error` instead, because a token that may still
+work is worth more than a tidy failure:
+
+```ruby
+oauth.invalid_at # => 2026-08-13 11:02:41, or nil while the credentials are good
+oauth.query '{ ok }' # => {} once they are refused, raises Jbr::Error where Jobber had trouble
+```
+
 ### Requests
 
 Create a Jobber request, finding or creating a Client with a matching phone number:

@@ -66,14 +66,7 @@ module Jbr
 
     # Exchange a code or a refresh token for credentials.
     def self.post(params = {})
-      uri = URI 'https://api.getjobber.com/api/oauth/token'
-      response = Net::HTTP.post_form uri,
-        params.merge(client_id: client_id, client_secret: client_secret)
-      raise Error, response.body unless response.is_a? Net::HTTPSuccess
-      output = JSON.parse(response.body)
-      { access_token: output['access_token'], refresh_token: output['refresh_token'],
-        expires_at: (Time.now + output.fetch('expires_in', 3600).to_i),
-      }
+      Token.post params.merge(client_id: client_id, client_secret: client_secret)
     end
 
   private
@@ -85,7 +78,7 @@ module Jbr
       @access_token = output[:access_token]
       @refresh_token = output[:refresh_token]
       @expires_at = output[:expires_at]
-    rescue Error => e
+    rescue Refused
       @invalid_at = Time.now
       false
     end

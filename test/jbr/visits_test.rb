@@ -79,7 +79,7 @@ class VisitsTest < Minitest::Test
 
   def test_the_visits_of_dead_credentials_are_none
     stub_graphql_failure status: 401
-    stub_request(:post, JobberStubs::TOKEN_URL).to_return status: 401
+    stub_refusal_to_refresh
 
     assert_empty oauth.visits.upcoming.to_a
   end

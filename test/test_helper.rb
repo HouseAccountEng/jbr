@@ -38,6 +38,11 @@ module JobberStubs
     body = { access_token: 'new-token', refresh_token: 'new-refresh', expires_in: 3600 }
     stub_request(:post, TOKEN_URL).to_return body: body.to_json
   end
+
+  # Answer the next token post the way Jobber answers a grant that is no good.
+  def stub_refusal_to_refresh
+    stub_request(:post, TOKEN_URL).to_return status: 400, body: { error: 'invalid_grant' }.to_json
+  end
 end
 
 class Minitest::Test

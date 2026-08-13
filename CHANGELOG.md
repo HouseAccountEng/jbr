@@ -1,3 +1,15 @@
+## [3.3.0] - 2026-08-13
+
+- [Fix] Credentials are given up only when Jobber says the grant itself is no good. Any
+  refusal at all used to set `invalid_at` -- a 500, a rate limit, an unreadable body -- so
+  a moment of trouble at Jobber's end read as a dead token, and an app acting on that could
+  revoke one that still worked. Only an `invalid_grant` Jobber names counts now; everything
+  else raises `Jbr::Error` for the caller to retry, which is what trouble deserves
+- [New] `Jbr::Refused`, a `Jbr::Error` for the grant being no good rather than for the
+  answer failing to arrive. Rescue it to tell the two apart
+- [Change] The token endpoint moved to `Jbr::Token`. `Jbr::OAuth.post` still answers it
+  unchanged, and so do `Jbr::OAuth.client_id` and `Jbr::OAuth.client_secret`
+
 ## [3.2.0] - 2026-08-13
 
 - [New] Wait rather than be refused. Jobber holds an app to two limits at once -- 2,500
