@@ -22,8 +22,8 @@ module GraphQL
       raise Unauthorized, response.body if response.code == '401'
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
       body = JSON.parse(response.body)
-      errors = body['errors'] || []
-      raise Error, errors.map { |error| error['message'] }.join('; ') unless errors.empty?
+      errors = body['errors']
+      raise Error, errors.map { |error| error['message'] }.join('; ') if errors.present?
       body.fetch('data')
     end
 

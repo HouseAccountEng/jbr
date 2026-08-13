@@ -1,3 +1,21 @@
+## [3.1.0] - 2026-08-13
+
+- [Fix] An answer Jobber left empty now reads as no answer rather than as an empty string.
+  `client.name` and `job.name` fall through a blank first name or a blank title instead of
+  handing one back, so a caller that validates presence is not handed `""` to store. A job
+  with no title still answers the ID it is filed under; a client with neither a first name
+  nor a company name answers nil
+- [New] A visit answers `name` as a job does -- its title, or the ID Jobber files it under
+  where nobody titled it. Both read it from `Jbr::Named`, so a record Jobber lets go
+  untitled is named the same way wherever it appears
+- [Fix] A blank address field does not come back from `property.address`, and is not sent
+  when a property is opened. Street, city, state and ZIP are absent rather than empty
+- [Fix] A blank timestamp reads as no time. `Time.iso8601` raises on an empty string, so a
+  visit or job Jobber dated with one used to take the whole walk down with it
+- [Change] Depend on Active Support, for `blank?`, `present?`, `presence` and
+  `compact_blank`. Two of its files are required, not the whole library: telling an empty
+  answer from a missing one was being done by hand, and being done inconsistently
+
 ## [3.0.0] - 2026-08-13
 
 - [Breaking change] `oauth.visits` and `oauth.jobs` answer the whole collection rather than

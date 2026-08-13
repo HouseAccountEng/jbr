@@ -32,8 +32,8 @@ module Jbr
     def company_name = @node['companyName']
 
     # Jobber files nobody without one name or the other, so there is always one to call them.
-    # @return [String] the person's first name, or the business's name.
-    def name = first_name || company_name
+    # @return [String, nil] the person's first name, or the business's name. Never empty.
+    def name = first_name.presence || company_name.presence
 
     # @return [String, nil] the address to write to.
     def email = @node['email']
@@ -89,12 +89,10 @@ module Jbr
       address, email = @create_params[:address], @create_params[:email]
       { firstName: @create_params[:first_name],
         lastName: @create_params[:last_name],
-        properties: ([ { address: Property.address_from(address) } ] if present?(address)),
+        properties: ([ { address: Property.address_from(address) } ] if address.present?),
         phones: [ { number: @create_params[:phone], primary: true } ],
-        emails: ([ { address: email, primary: true } ] if present?(email)),
+        emails: ([ { address: email, primary: true } ] if email.present?),
       }.compact
     end
-
-    def present?(value) = !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
   end
 end

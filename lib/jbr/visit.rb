@@ -1,7 +1,7 @@
 module Jbr
   # One stop at a property: when the work on a job is scheduled to happen.
   class Visit < Resource
-    include Cliental, Properted
+    include Cliental, Named, Properted
 
     # @return [String, nil] what the visit is called.
     def title = @node['title']

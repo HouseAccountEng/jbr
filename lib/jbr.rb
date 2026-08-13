@@ -1,6 +1,12 @@
 require 'json'
 require 'net/http'
 
+# Only the two Active Support files whose methods are used, rather than the whole of it:
+# Jobber answers a field it holds nothing for with an empty string as readily as with null,
+# and a caller who validates presence needs those to arrive as the same nothing.
+require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/enumerable'
+
 require 'graphql/error'
 require 'graphql/unauthorized'
 require 'graphql/client'
@@ -13,6 +19,7 @@ require 'jbr/error'
 # Jobber for about a client is built as they load.
 require 'jbr/phone'
 require 'jbr/cliental'
+require 'jbr/named'
 require 'jbr/resource'
 require 'jbr/request'
 require 'jbr/oauth'

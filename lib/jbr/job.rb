@@ -1,14 +1,10 @@
 module Jbr
   # Work a Jobber user accepted and scheduled.
   class Job < Resource
-    include Cliental, Properted
+    include Cliental, Named, Properted
 
     # @return [String, nil] what the job is called, where whoever opened it named it.
     def title = @node['title']
-
-    # A job goes untitled often enough, and something has to stand in for it on a list.
-    # @return [String] the title, or the ID Jobber files the job under.
-    def name = title || id
 
     # @return [String, nil] what the work is, in the words whoever opened the job wrote.
     def instructions = @node['instructions']

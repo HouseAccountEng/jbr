@@ -17,8 +17,9 @@ module Jbr
 
   private
 
-    # @return [Time, nil] what Jobber answered under a key, as a time.
-    def time(key) = (Time.iso8601 @node[key] if @node[key])
+    # @return [Time, nil] what Jobber answered under a key, as a time. An empty answer is no
+    #   answer: Time.iso8601 raises on one, where nothing at all it simply has none of.
+    def time(key) = (Time.iso8601 @node[key] if @node[key].present?)
 
     # Every item a paged query answers, one at a time, a page read only once the one before
     # it runs out. The filter is data: handed none, the query narrows nothing.

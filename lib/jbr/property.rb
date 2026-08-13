@@ -44,7 +44,7 @@ module Jbr
     # @param fields [Hash] any of :street, :city, :state and :zip.
     # @return [Hash] the address, without the fields the caller left out.
     def self.address_from(fields = {})
-      FIELDS.to_h { |jobber, ours| [ jobber, fields[ours] ] }.compact
+      FIELDS.to_h { |jobber, ours| [ jobber, fields[ours] ] }.compact_blank
     end
 
     # The fields a caller reads, from the address as Jobber holds it.
@@ -55,7 +55,7 @@ module Jbr
       address ||= {}
       coordinates = address['coordinates'] || {}
       FIELDS.to_h { |jobber, ours| [ ours, address[jobber.to_s] ] }.
-        merge(COORDINATES.to_h { |ours| [ ours, coordinates[ours.to_s] ] }).compact
+        merge(COORDINATES.to_h { |ours| [ ours, coordinates[ours.to_s] ] }).compact_blank
     end
 
     # Reach the property at an address, adding one when none of the client's matches.

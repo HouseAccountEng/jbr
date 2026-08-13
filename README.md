@@ -1,6 +1,7 @@
 # Jobber API Ruby client
 
-A client for the Jobber GraphQL API. It needs nothing but the standard library.
+A client for the Jobber GraphQL API. It needs the standard library and two files of Active
+Support, to tell a field Jobber answered empty from one it never answered at all.
 
 ## Available methods
 
@@ -83,7 +84,7 @@ oauth.jobs.past # => an Enumerator of the ones dated before now
 oauth.jobs.upcoming # => an Enumerator of the ones dated from now on
 
 job = jobs.first
-job.name # => 'Furnace tune-up', or the job's ID where nobody titled it. Never nil
+job.name # => 'Furnace tune-up', or the job's ID where nobody titled it. Never nil or empty
 job.title # => 'Furnace tune-up'
 job.instructions # => 'Ring the doorbell twice'
 job.status # => 'requires_invoicing'
@@ -116,6 +117,7 @@ oauth.visits.past # => an Enumerator of the ones dated before now
 
 visit = visits.first
 visit.id # => 'Z2lkOi8vS'
+visit.name # => 'Furnace tune-up', or the visit's ID where nobody titled it. Never nil or empty
 visit.title # => 'Furnace tune-up'
 visit.job_id # => 'Z2lkOi8vS'
 visit.starts_at # => 2026-08-09 14:00:00
@@ -132,7 +134,8 @@ asked for. Chain `includes` the way Active Record does, on visits or on jobs:
 ```ruby
 visit = oauth.visits.includes(:client, property: :client).upcoming.first
 
-visit.client.name # => 'Jane', or the business's name where the client is a business
+visit.client.name # => 'Jane', or the business's name where the client is a business.
+                  # Never an empty string: a blank first name falls through to the company
 visit.client.first_name # => 'Jane'
 visit.client.last_name # => 'Doe'
 visit.client.company_name # => nil

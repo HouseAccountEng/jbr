@@ -29,6 +29,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = [ 'lib' ]
 
+  spec.add_dependency 'activesupport' # to tell an empty answer from a missing one
+
   spec.add_development_dependency 'minitest' # to run the test suite
   spec.add_development_dependency 'rake' # to run 'bundle exec rake'
   spec.add_development_dependency 'rubocop-rails-omakase' # to run 'bundle exec rubocop'
