@@ -43,20 +43,6 @@ class RefusalsTest < Minitest::Test
     assert credentials.invalid_at
   end
 
-  # A token that may still work is worth more than a tidy failure: Jobber having a bad
-  # moment is not Jobber saying the grant is dead, and only the second may give it up.
-  def test_a_refresh_token_jobber_will_not_take_invalidates_the_credentials
-    stub_graphql_failure status: 401, body: 'expired'
-    # Jobber answers the token endpoint in prose and with a 401, not the 400 and the JSON the
-    # OAuth 2 word for this comes in
-    stub_request(:post, TOKEN_URL).
-      to_return status: 401, body: 'The provided refresh token is not valid.'
-    credentials = oauth
-
-    assert_empty credentials.query('{ ok }')
-    assert credentials.invalid_at
-  end
-
   def test_trouble_at_jobbers_end_leaves_the_credentials_alone
     stub_graphql_failure status: 401, body: 'expired'
     stub_request(:post, TOKEN_URL).to_return status: 500, body: 'Internal Server Error'

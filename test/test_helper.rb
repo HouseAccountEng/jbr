@@ -41,7 +41,8 @@ module JobberStubs
 
   # Answer the next token post the way Jobber answers a grant that is no good.
   def stub_refusal_to_refresh
-    stub_request(:post, TOKEN_URL).to_return status: 400, body: { error: 'invalid_grant' }.to_json
+    stub_request(:post, TOKEN_URL).
+      to_return status: 401, body: 'The provided refresh token is not valid.'
   end
 end
 

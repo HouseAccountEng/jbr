@@ -1,3 +1,10 @@
+## [3.7.2] - 2026-08-17
+
+- [Change] Jobber's token endpoint answers in prose, so that is all this reads. 3.7.1 kept a
+  branch for the OAuth 2 `invalid_grant` in a JSON body, guarded by a rescue for a body that
+  would not parse — and every failure body Jobber has ever been seen to send is prose, so the
+  rescue was the path and the branch it protected had never once been taken. Both are gone
+
 ## [3.7.1] - 2026-08-17
 
 - [Fix] A refresh token Jobber will not take gives the credentials up, as it always should

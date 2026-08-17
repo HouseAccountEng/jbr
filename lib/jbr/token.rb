@@ -4,12 +4,10 @@ module Jbr
     # Where a grant is exchanged.
     URL = 'https://api.getjobber.com/api/oauth/token'
 
-    # What Jobber calls a grant that is no good, in the OAuth 2 word for it.
-    REFUSAL = 'invalid_grant'
-
-    # And what it calls one in the prose it answers a refresh token with instead. Specific to
-    # the token rather than to the app, which is the whole reason for reading the body.
-    REFUSAL_TEXT = /refresh token is not valid/
+    # What Jobber says of a grant it will not take, in the prose it answers with. About the
+    # token rather than about the app, which is what tells it from the 401 a wrong client id and
+    # secret get — and that one is every account at once rather than this one.
+    REFUSAL = /refresh token is not valid/
 
     # Trade a grant for credentials.
     # @param params [Hash] the grant, and the app making the exchange.
@@ -18,7 +16,7 @@ module Jbr
     # @return [Hash] the tokens, and the moment the access one expires.
     def self.post(params = {})
       response = Net::HTTP.post_form URI(URL), params
-      raise Refused, response.body if refused? response
+      raise Refused, response.body if REFUSAL.match? response.body
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
 
       output = JSON.parse response.body
@@ -26,22 +24,5 @@ module Jbr
         expires_at: (Time.now + output.fetch('expires_in', 3600).to_i),
       }
     end
-
-    # Refused where Jobber turns the grant down rather than failing to answer about it: it names
-    # the word, or it names the token. Never the status on its own — Jobber answers 401 to a
-    # refresh token it will not take and 401 to an app whose own credentials are wrong, and
-    # acting on the second as though it were the first would disconnect every account at once.
-    def self.refused?(response)
-      return false if response.is_a? Net::HTTPSuccess
-
-      coded_refusal?(response.body) || REFUSAL_TEXT.match?(response.body.to_s)
-    end
-
-    def self.coded_refusal?(body)
-      JSON.parse(body)['error'] == REFUSAL
-    rescue JSON::ParserError
-      false
-    end
-    private_class_method :refused?, :coded_refusal?
   end
 end
