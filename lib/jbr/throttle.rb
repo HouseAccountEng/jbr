@@ -21,7 +21,9 @@ module Jbr
     def read(extensions)
       cost = extensions.to_h['cost'].to_h
       status = cost['throttleStatus'].to_h
-      @cost = cost['actualQueryCost'].to_f
+      # What a refused query would have cost is what it costs: Jobber prices it either way,
+      # and only an answered one reports an actual.
+      @cost = (cost['actualQueryCost'] || cost['requestedQueryCost']).to_f
       @available = status['currentlyAvailable'].to_f
       @restore_rate = status['restoreRate'].to_f
     end

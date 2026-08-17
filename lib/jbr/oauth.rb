@@ -41,6 +41,11 @@ module Jbr
       client.query(statement, variables: variables) { |extensions| throttle.read extensions }
     rescue GraphQL::Unauthorized
       refresh ? retry : {}
+    rescue GraphQL::Error => error
+      # The transport's own class never leaves the gem: a caller told to rescue `Jbr::Error`
+      # was not catching a throttle, a 500 or an unreadable answer, and had its own job blow
+      # up instead of hearing that Jobber would not answer.
+      raise Error, error.message
     end
 
     # Delete a token. If the token is invalid, do nothing.

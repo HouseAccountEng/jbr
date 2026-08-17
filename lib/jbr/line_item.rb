@@ -5,8 +5,13 @@ module Jbr
     # What Jobber calls each field of a line.
     FIELDS = %w[quantity name description]
 
+    # The most lines to read off one record. Bounded because Jobber prices a connection by the
+    # page it is asked for and prices an unbounded one at its own maximum, so the lines of a
+    # page of jobs were charged for as though every job had the largest job's worth of them.
+    PAGE = 20
+
     # What to ask for wherever a record lists the lines it is made of.
-    SELECTION = "lineItems { nodes { #{FIELDS.join ' '} } }"
+    SELECTION = "lineItems(first: #{PAGE}) { nodes { #{FIELDS.join ' '} } }"
 
     # @param nodes [Array<Hash>, nil] the lines as Jobber answered them, if it answered any.
     # @return [Array<LineItem>] one per line, in the order Jobber holds them.

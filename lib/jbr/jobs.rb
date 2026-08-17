@@ -29,12 +29,14 @@ module Jbr
 
   private
 
-    # Forty a page, not a hundred: Jobber prices a query by its page size and refuses the
-    # wider one, and what an includes brings back is charged for on top.
+    # Twenty a page, not forty and not a hundred: Jobber prices a query by its page size, and
+    # what an includes brings back is charged for on top of every row of it — so a page of jobs
+    # carrying their lines, their property and its client priced past what a bucket holds. Half
+    # the page costs half the query and loses nothing, since a walk simply reads more pages.
     def page
       <<~GRAPHQL
         query($after: String, $filter: JobFilterAttributes) {
-          jobs(first: 40, after: $after, filter: $filter) {
+          jobs(first: 20, after: $after, filter: $filter) {
             nodes { #{FIELDS} #{selections} }
             pageInfo { hasNextPage endCursor }
           }

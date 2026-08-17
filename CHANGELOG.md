@@ -1,3 +1,23 @@
+## [3.5.0] - 2026-08-17
+
+- [Fix] A walk of jobs carrying their line items was refused outright: `Throttled`. Jobber
+  prices a query by the page it asks for and prices an *unbounded* connection at its own
+  maximum, so `lineItems` on a page of 40 jobs was charged as though every job carried the
+  largest job's worth of lines. The connection is bounded at 20 now, and a page of jobs is 20
+  rather than 40 — half the page is half the query, and a walk loses nothing by reading twice
+  as many. A job with more than 20 lines is summarized by its first 20
+- [Fix] Jobber's own failures reach a caller as `Jbr::Error`, which is what this gem has
+  always said they would. `GraphQL::Error` was escaping instead, so an app that rescued
+  `Jbr::Error` — as the README tells it to — was not catching a throttle, a 500 or an
+  unreadable answer, and had its own job blow up rather than hearing that Jobber said no
+- [Fix] A refusal for cost says what the cost was: `Throttled (cost 12400, 9500 of 10000
+  available, restoring 500/s)` rather than `Throttled`. Without the numbers there is no
+  telling a query too big to ever run from a bucket that needed another second
+- [Change] A refused query prices the next one. Jobber reports the bucket when it says no as
+  readily as when it answers, and the throttle was only reading it on the way through — so a
+  walk that hit the ceiling then asked again immediately, at the same size, and was refused
+  again
+
 ## [3.4.0] - 2026-08-17
 
 - [New] `line_items` on a job: what the work actually was, where the title is only what

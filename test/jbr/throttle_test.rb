@@ -41,6 +41,40 @@ class ThrottleTest < Minitest::Test
     assert_in_delta 0, @throttle.wait
   end
 
+  def test_a_refusal_for_cost_says_what_the_query_would_have_cost
+    throttled = { errors: [ { message: 'Throttled', extensions: { code: 'THROTTLED' } } ],
+                  extensions: { cost: { requestedQueryCost: 12_400,
+                                        throttleStatus: { maximumAvailable: 10_000,
+                                                          currentlyAvailable: 9_500,
+                                                          restoreRate: 500, }, } },
+    }
+    stub_request(:post, JobberStubs::GRAPHQL_URL).to_return body: throttled.to_json
+
+    # A caller told to rescue Jbr::Error hears about it, rather than the transport's own class
+    # escaping into their job. And the message says whether waiting could ever have helped
+    error = assert_raises(Jbr::Error) { oauth.jobs.to_a }
+
+    assert_equal 'Throttled (cost 12400, 9500 of 10000 available, restoring 500/s)',
+                 error.message
+  end
+
+  def test_a_refusal_prices_the_query_the_next_one_waits_for
+    throttled = { errors: [ { message: 'Throttled' } ],
+                  extensions: { cost: { requestedQueryCost: 100,
+                                        throttleStatus: { currentlyAvailable: 60,
+                                                          restoreRate: 400, }, } },
+    }
+    stub_request(:post, JobberStubs::GRAPHQL_URL).to_return body: throttled.to_json
+    credentials = oauth
+    assert_raises(Jbr::Error) { credentials.jobs.to_a }
+
+    # 40 points short at 400 a second, learned from a query Jobber priced but never answered
+    started = Time.now
+    assert_raises(Jbr::Error) { credentials.jobs.to_a }
+
+    assert_in_delta 0.1, Time.now - started, 0.05
+  end
+
   def test_a_walk_paces_itself_between_pages
     page = { 'nodes' => [], 'pageInfo' => { 'hasNextPage' => true, 'endCursor' => 'a' } }
     last = { 'nodes' => [], 'pageInfo' => { 'hasNextPage' => false } }

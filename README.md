@@ -126,9 +126,10 @@ line.to_s # => '3 Bathroom Faucet Installation (Professional installation of a n
           #     faucet)', and without the parenthesis where nobody described it
 ```
 
-Every line Jobber holds is in the list, in the order it holds them and whatever each is
-quantified at. One it holds no quantity for reads as its name alone. Ask for nothing and
-nothing arrives, so `oauth.jobs.first.line_items` is empty where the query never named them.
+Every line Jobber holds is in the list, up to twenty of them, in the order it holds them and
+whatever each is quantified at. One it holds no quantity for reads as its name alone. Ask for
+nothing and nothing arrives, so `oauth.jobs.first.line_items` is empty where the query never
+named them.
 
 ### Invoices
 
@@ -204,6 +205,12 @@ done about either — every request waits for itself:
 
 A request that follows no other waits for nothing, so a single `find` is as quick as it ever
 was. Only a walk long enough to be a problem is slowed, and only by as much as it must be.
+
+Where Jobber refuses for cost anyway, the `Jbr::Error` raised says what the query would have
+cost against what was available — `Throttled (cost 12400, 9500 of 10000 available, restoring
+500/s)` — so a query too big to ever run reads apart from a bucket that needed a moment. Every
+connection this gem asks for is bounded, because Jobber prices an unbounded one at its own
+maximum: twenty lines to a job, and twenty jobs or visits to a page.
 
 ### Events
 

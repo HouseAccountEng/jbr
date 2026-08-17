@@ -23,13 +23,27 @@ module GraphQL
       raise Unauthorized, response.body if response.code == '401'
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
       body = JSON.parse(response.body)
-      errors = body['errors']
-      raise Error, errors.map { |error| error['message'] }.join('; ') if errors.present?
+      # Before the refusal, not after it: an endpoint that reports what it will still answer
+      # reports it when it says no, which is when a caller most needs to know.
       yield body['extensions'] if block_given?
+      raise Error, refusal(body) if body['errors'].present?
       body.fetch('data')
     end
 
   private
+
+    # What the endpoint refused, and — where it priced the refusal — what the query would have
+    # cost against what was available. `Throttled` on its own leaves a caller unable to tell a
+    # query too big to ever run from a bucket that only needed a moment.
+    def refusal(body)
+      message = body['errors'].map { |error| error['message'] }.join '; '
+      cost = body['extensions'].to_h['cost'].to_h
+      status = cost['throttleStatus'].to_h
+      return message if status.empty?
+
+      "#{message} (cost #{cost['requestedQueryCost']}, #{status['currentlyAvailable']} of " \
+        "#{status['maximumAvailable']} available, restoring #{status['restoreRate']}/s)"
+    end
     def request_headers
       { 'Authorization' => "Bearer #{@token}", 'Content-Type' => 'application/json' }.merge @headers
     end

@@ -18,12 +18,12 @@ module Jbr
 
   private
 
-    # Forty a page, not a hundred: Jobber prices a query by its page size and refuses the
-    # wider one, and what an includes brings back is charged for on top.
+    # Twenty a page, the same as jobs: Jobber prices a query by its page size, and what an
+    # includes brings back is charged for on top of every row of it.
     def page
       <<~GRAPHQL
         query($after: String, $filter: VisitFilterAttributes) {
-          visits(first: 40, after: $after, filter: $filter) {
+          visits(first: 20, after: $after, filter: $filter) {
             nodes { #{FIELDS} #{selections} }
             pageInfo { hasNextPage endCursor }
           }
