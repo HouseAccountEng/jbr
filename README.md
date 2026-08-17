@@ -119,11 +119,9 @@ job.line_items # => an Array of the lines the job is made of
 line = job.line_items.first
 line.quantity # => 3, whole where Jobber's own Float has nothing after the point, and 3.5
               #    where it has: `3 Faucets`, or `3.5 Hours` for what was really billed
-line.quantified # => '3 Bathroom Faucet Installation', how many of what
 line.name # => 'Bathroom Faucet Installation'
-line.description # => 'Professional installation of a new bathroom faucet'
-line.to_s # => '3 Bathroom Faucet Installation (Professional installation of a new bathroom
-          #     faucet)', and without the parenthesis where nobody described it
+line.to_s # => '3 Bathroom Faucet Installation', how many of what, and the name alone where
+          #    Jobber holds no quantity for the line
 ```
 
 Every line Jobber holds is in the list, up to twenty of them, in the order it holds them and

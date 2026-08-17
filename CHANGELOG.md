@@ -1,3 +1,12 @@
+## [3.5.1] - 2026-08-17
+
+- [Change] A line item is how many of what, and nothing else. `description` was answered and
+  read out in `to_s` alongside the quantity and the name, and no caller ever wanted it — so it
+  is not asked of Jobber any more, which is a smaller query as well as a smaller class.
+  `quantified` goes with it: it existed only to be the half of `to_s` without a description,
+  and `to_s` is that on its own now. A job's summary is `line_items.to_sentence`, since
+  `to_sentence` reads each line's own string form
+
 ## [3.5.0] - 2026-08-17
 
 - [Fix] A walk of jobs carrying their line items was refused outright: `Throttled`. Jobber

@@ -3,12 +3,11 @@ require 'test_helper'
 class LineItemsTest < Minitest::Test
   def test_a_job_reads_out_the_lines_it_was_asked_for
     stub_graphql 'jobs' => { 'nodes' => [ { 'id' => 'job-01', 'lineItems' => { 'nodes' => [
-      { 'quantity' => 3.0, 'name' => 'Bathroom Faucet Installation',
-        'description' => 'Professional installation of a new bathroom faucet', },
-      { 'quantity' => 2.0, 'name' => 'Change Toilet Valve', 'description' => nil },
-      { 'quantity' => 1.5, 'name' => 'Hours of labour', 'description' => 'At the hourly rate' },
-      { 'quantity' => 0, 'name' => 'Waived disposal fee', 'description' => 'Not charged' },
-      { 'quantity' => nil, 'name' => 'Unquantified', 'description' => 'Nobody said how many' },
+      { 'quantity' => 3.0, 'name' => 'Bathroom Faucet Installation' },
+      { 'quantity' => 2.0, 'name' => 'Change Toilet Valve' },
+      { 'quantity' => 1.5, 'name' => 'Hours of labour' },
+      { 'quantity' => 0, 'name' => 'Waived disposal fee' },
+      { 'quantity' => nil, 'name' => 'Unquantified' },
     ] }, } ], 'pageInfo' => { 'hasNextPage' => false }, }
 
     job = oauth.jobs.includes(:line_items).first
@@ -18,17 +17,12 @@ class LineItemsTest < Minitest::Test
     assert_equal [ 'Bathroom Faucet Installation', 'Change Toilet Valve', 'Hours of labour',
                    'Waived disposal fee', 'Unquantified', ], items.map(&:name)
     assert_equal 3, items.first.quantity
-    assert_equal 'Professional installation of a new bathroom faucet', items.first.description
-    assert_equal '3 Bathroom Faucet Installation ' \
-                 '(Professional installation of a new bathroom faucet)', items.first.to_s
-    # A line nobody described reads without the empty parenthesis
-    assert_equal '2 Change Toilet Valve', items[1].to_s
+    assert_equal '3 Bathroom Faucet Installation', items.first.to_s
     # A whole quantity reads as an integer and a fraction keeps its point
     assert_in_delta 1.5, items[2].quantity
-    assert_equal '1.5 Hours of labour (At the hourly rate)', items[2].to_s
-    # A line Jobber holds no quantity for reads as its name alone, here and in the sentence
-    assert_equal 'Unquantified (Nobody said how many)', items.last.to_s
-    assert_equal 'Unquantified', items.last.quantified
+    assert_equal '1.5 Hours of labour', items[2].to_s
+    # A line Jobber holds no quantity for reads as its name alone
+    assert_equal 'Unquantified', items.last.to_s
     # And a job summarizes itself by its lines, each as how many of what
     assert_equal '3 Bathroom Faucet Installation, 2 Change Toilet Valve, 1.5 Hours of labour, ' \
                  '0 Waived disposal fee, and Unquantified', job.summary

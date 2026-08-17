@@ -1,9 +1,8 @@
 module Jbr
-  # One line of the work a job is made of: how many of a thing, what it is called, and what
-  # doing it involves.
+  # One line of the work a job is made of: how many of a thing, and what it is called.
   class LineItem < Resource
     # What Jobber calls each field of a line.
-    FIELDS = %w[quantity name description]
+    FIELDS = %w[quantity name]
 
     # The most lines to read off one record. Bounded because Jobber prices a connection by the
     # page it is asked for and prices an unbounded one at its own maximum, so the lines of a
@@ -23,16 +22,9 @@ module Jbr
     # @return [String, nil] what the line is called.
     def name = @node['name']
 
-    # @return [String, nil] what doing it involves, in whoever wrote the line's own words.
-    def description = @node['description']
-
     # @return [String] how many of what: `3 Bathroom Faucet Installation`, and the name alone
     #   where Jobber holds no quantity for the line.
-    def quantified = [ quantity, name ].compact.join ' '
-
-    # @return [String] how a line reads: `3 Faucet install (Fits a new faucet)`, and without
-    #   the parenthesis where nobody described it.
-    def to_s = [ quantified, described ].compact.join ' '
+    def to_s = [ quantity, name ].compact.join ' '
 
   private
 
@@ -40,7 +32,5 @@ module Jbr
     # `3 Faucets` rather than `3.0 Faucets`. A fraction keeps its point — `3.5 Faucets` —
     # since rounding it would lie about what was billed.
     def whole(number) = number && ((number % 1).zero? ? number.to_i : number)
-
-    def described = ("(#{description})" if description.present?)
   end
 end

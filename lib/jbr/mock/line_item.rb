@@ -6,7 +6,5 @@ module Jbr
     def quantity = whole @node[:quantity]
 
     def name = @node[:name]
-
-    def description = @node[:description]
   end
 end

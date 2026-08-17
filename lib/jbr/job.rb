@@ -10,11 +10,11 @@ module Jbr
     def instructions = @node['instructions']
 
     # What the job's lines add up to, each as how many of what: `3 Faucet install and 2 Valve
-    # change`. The lines say what the work was where a title only says what it was called, so
-    # this reads better than one — and falls back to {#name} where the job has no lines, or
-    # where the query never asked for them. Never nil and never empty.
-    # @return [String] the lines as a sentence, or the title, or the ID.
-    def summary = line_items.map(&:quantified).to_sentence.presence || name
+    # change` — `to_sentence` reading each line's own string form. The lines say what the work
+    # was where a title only says what it was called, so this reads better than one, and falls
+    # back to {#name} where the job has no lines or the query never asked for them.
+    # @return [String] the lines as a sentence, or the title, or the ID. Never nil, never empty.
+    def summary = line_items.to_sentence.presence || name
 
     # @return [String, nil] where Jobber files the job in its own workflow.
     def status = @node['jobStatus']
