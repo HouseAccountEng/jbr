@@ -119,16 +119,16 @@ job.line_items # => an Array of the lines the job is made of
 line = job.line_items.first
 line.quantity # => 3, whole where Jobber's own Float has nothing after the point, and 3.5
               #    where it has: `3 Faucets`, or `3.5 Hours` for what was really billed
+line.quantified # => '3 Bathroom Faucet Installation', how many of what
 line.name # => 'Bathroom Faucet Installation'
 line.description # => 'Professional installation of a new bathroom faucet'
 line.to_s # => '3 Bathroom Faucet Installation (Professional installation of a new bathroom
           #     faucet)', and without the parenthesis where nobody described it
 ```
 
-A line quantified at nothing is not in the list, and neither is one nobody quantified at
-all — but a fraction of one is, since half an hour of labour is still labour. Ask for nothing
-and nothing arrives, so `oauth.jobs.first.line_items` is empty where the query never named
-them.
+Every line Jobber holds is in the list, in the order it holds them and whatever each is
+quantified at. One it holds no quantity for reads as its name alone. Ask for nothing and
+nothing arrives, so `oauth.jobs.first.line_items` is empty where the query never named them.
 
 ### Invoices
 

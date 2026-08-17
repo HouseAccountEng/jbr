@@ -14,7 +14,7 @@ module Jbr
     # this reads better than one — and falls back to {#name} where the job has no lines, or
     # where the query never asked for them. Never nil and never empty.
     # @return [String] the lines as a sentence, or the title, or the ID.
-    def summary = quantified.to_sentence.presence || name
+    def summary = line_items.map(&:quantified).to_sentence.presence || name
 
     # @return [String, nil] where Jobber files the job in its own workflow.
     def status = @node['jobStatus']
@@ -36,9 +36,5 @@ module Jbr
 
     # @return [Time, nil] the job completed time
     def completed_at = time 'completedAt'
-
-  private
-
-    def quantified = line_items.map { |item| "#{item.quantity} #{item.name}" }
   end
 end

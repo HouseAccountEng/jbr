@@ -8,14 +8,9 @@ module Jbr
     # What to ask for wherever a record lists the lines it is made of.
     SELECTION = "lineItems { nodes { #{FIELDS.join ' '} } }"
 
-    # The lines worth reading out, from the nodes Jobber answered with. None of a thing is
-    # not a thing a page says, and neither is a line nobody quantified; a fraction of one is,
-    # since half an hour of labour is still labour.
     # @param nodes [Array<Hash>, nil] the lines as Jobber answered them, if it answered any.
-    # @return [Array<LineItem>] one per line quantified at anything at all.
-    def self.from(nodes)
-      nodes.to_a.map { |node| new node: node }.reject { |item| item.quantity.to_f.zero? }
-    end
+    # @return [Array<LineItem>] one per line, in the order Jobber holds them.
+    def self.from(nodes) = nodes.to_a.map { |node| new node: node }
 
     # @return [Integer, Float, nil] how many of it the job is for.
     def quantity = whole @node['quantity']
@@ -26,9 +21,13 @@ module Jbr
     # @return [String, nil] what doing it involves, in whoever wrote the line's own words.
     def description = @node['description']
 
+    # @return [String] how many of what: `3 Bathroom Faucet Installation`, and the name alone
+    #   where Jobber holds no quantity for the line.
+    def quantified = [ quantity, name ].compact.join ' '
+
     # @return [String] how a line reads: `3 Faucet install (Fits a new faucet)`, and without
     #   the parenthesis where nobody described it.
-    def to_s = [ quantity, name, described ].compact.join ' '
+    def to_s = [ quantified, described ].compact.join ' '
 
   private
 
