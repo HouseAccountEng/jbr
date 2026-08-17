@@ -1,3 +1,9 @@
+## [3.6.1] - 2026-08-17
+
+- [Fix] 3.6.0 shipped without the two files it added, `graphql/throttled` and `jbr/asking`, so
+  requiring the gem raised `LoadError` and nothing worked at all. The gem's file list comes
+  from `git ls-files` and the release commit never added them. 3.6.0 is yanked
+
 ## [3.6.0] - 2026-08-17
 
 - [Fix] A refusal for cost the bucket can recover from is waited out and asked again, up to
