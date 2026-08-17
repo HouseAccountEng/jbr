@@ -1,11 +1,13 @@
 require 'json'
 require 'net/http'
 
-# Only the two Active Support files whose methods are used, rather than the whole of it:
+# Only the three Active Support files whose methods are used, rather than the whole of it:
 # Jobber answers a field it holds nothing for with an empty string as readily as with null,
-# and a caller who validates presence needs those to arrive as the same nothing.
+# and a caller who validates presence needs those to arrive as the same nothing. The third is
+# for the sentence a job's lines read as.
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/enumerable'
+require 'active_support/core_ext/array/conversions'
 
 require 'graphql/error'
 require 'graphql/unauthorized'
@@ -32,6 +34,10 @@ require 'jbr/account'
 require 'jbr/property'
 require 'jbr/properted'
 require 'jbr/includable'
+# LineItem before Itemized, and both before Job: the lines a job is made of are asked for
+# by a constant the include reads as it loads.
+require 'jbr/line_item'
+require 'jbr/itemized'
 require 'jbr/client'
 require 'jbr/invoice'
 require 'jbr/job'
@@ -44,6 +50,7 @@ require 'jbr/mock/oauth'
 require 'jbr/mock/client'
 require 'jbr/mock/property'
 require 'jbr/mock/quote'
+require 'jbr/mock/line_item'
 require 'jbr/mock/job'
 require 'jbr/mock/jobs'
 require 'jbr/mock/invoice'

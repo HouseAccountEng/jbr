@@ -22,6 +22,8 @@ module Jbr
 
     def property = Mock::Property.new(node: @node.fetch(:property, {}))
 
+    def line_items = Mock::LineItem.from(@node.fetch(:line_items, []))
+
     def scheduled_at = @node[:scheduled_at]
 
     def completed_at = @node[:completed_at]

@@ -1,3 +1,18 @@
+## [3.4.0] - 2026-08-17
+
+- [New] `line_items` on a job: what the work actually was, where the title is only what
+  somebody called it. Each is a `Jbr::LineItem` answering `quantity`, `name` and
+  `description`, and reading as `3 Bathroom Faucet Installation (Professional installation
+  of a new bathroom faucet)` — without the parenthesis where nobody described it. A line
+  quantified at less than one is left out: none of a thing, a fraction of one, and one
+  nobody quantified are all not work done
+- [New] `includes(:line_items)`, which is how they are asked for. Nothing nested arrives
+  unasked, so the import walks that never read a line item pay nothing for them
+- [New] `summary` on a job: its lines as a sentence of how many of what, `3 Bathroom Faucet
+  Installation and 2 Change Toilet Valve`. What the work was, where `title` is only what
+  somebody called it — and `name` again where the job has no lines, or where the query never
+  asked for them, so it is never nil and never empty
+
 ## [3.3.0] - 2026-08-13
 
 - [Fix] Credentials are given up only when Jobber says the grant itself is no good. Any

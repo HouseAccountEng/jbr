@@ -2,8 +2,8 @@ module Jbr
   # Extends a list of records with the chaining that says what to bring back beside them.
   # Nothing extra comes back unasked: a page costs what it carries.
   module Includable
-    # @param names [Array<Symbol, Hash>] :client, :property, or property: :client for the
-    #   client whose file the place sits on.
+    # @param names [Array<Symbol, Hash>] :client, :line_items, :property, or
+    #   property: :client for the client whose file the place sits on.
     # @return [Resource] the same list, asking Jobber for those too.
     def includes(*names)
       named = names.each_with_object({}) do |name, all|
@@ -20,6 +20,7 @@ module Jbr
     def selection_of(name, nested)
       case name
         when :client then Cliental::SELECTION
+        when :line_items then LineItem::SELECTION
         when :property then Properted.selection client: nested == :client
       end
     end

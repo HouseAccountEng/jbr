@@ -104,6 +104,30 @@ job.quote_total # => 240.0
 job.created_at # => 2026-05-10 09:15:00
 ```
 
+### Line items
+
+What the work actually was, where the title is only what somebody called it. Asked for the
+same way as anything nested, since a page costs what it carries:
+
+```ruby
+job = oauth.jobs.includes(:line_items).find 'Njc5MTk5'
+
+job.summary # => '3 Bathroom Faucet Installation and 2 Change Toilet Valve', the lines as a
+            #    sentence of how many of what. Falls back to #name where there are none
+
+job.line_items # => an Array of the lines the job is made of
+line = job.line_items.first
+line.quantity # => 3, whole where Jobber's own Float has nothing after the point
+line.name # => 'Bathroom Faucet Installation'
+line.description # => 'Professional installation of a new bathroom faucet'
+line.to_s # => '3 Bathroom Faucet Installation (Professional installation of a new bathroom
+          #     faucet)', and without the parenthesis where nobody described it
+```
+
+A line quantified at less than one is not in the list: neither none of a thing, nor a
+fraction of one, nor one nobody quantified at all reads as work done. Ask for nothing and
+nothing arrives, so `oauth.jobs.first.line_items` is empty where the query never named them.
+
 ### Invoices
 
 Fetch a non-draft invoice from Jobber:
@@ -247,6 +271,18 @@ Jbr.mock.jobs = [ { id: 'job-01', title: 'Furnace tune-up', status: 'archived',
   scheduled_at: Date.yesterday.noon, completed_at: Date.today.noon,
   property: { id: 'property-01', street: '1 Main St',
     client: { id: 'client-01', company_name: 'Acme Property Management' } } } ]
+```
+
+Mock the lines a job is made of, under the job that is made of them:
+
+```ruby
+Jbr.mock.jobs = [ { id: 'job-01', line_items: [
+  { quantity: 3.0, name: 'Bathroom Faucet Installation',
+    description: 'Professional installation of a new bathroom faucet' },
+  { quantity: 2.0, name: 'Change Toilet Valve' } ] } ]
+
+oauth.jobs.past.first.summary
+# => '3 Bathroom Faucet Installation and 2 Change Toilet Valve'
 ```
 
 ### Visits
