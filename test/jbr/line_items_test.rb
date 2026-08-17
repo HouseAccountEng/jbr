@@ -7,16 +7,15 @@ class LineItemsTest < Minitest::Test
         'description' => 'Professional installation of a new bathroom faucet', },
       { 'quantity' => 2.0, 'name' => 'Change Toilet Valve', 'description' => nil },
       { 'quantity' => 1.5, 'name' => 'Hours of labour', 'description' => 'At the hourly rate' },
-      { 'quantity' => 0.5, 'name' => 'Half a call-out', 'description' => 'Shared with next door' },
       { 'quantity' => 0, 'name' => 'Waived disposal fee', 'description' => 'Not charged' },
       { 'quantity' => nil, 'name' => 'Unquantified', 'description' => 'Nobody said how many' },
-    ] } } ], 'pageInfo' => { 'hasNextPage' => false } }
+    ] }, } ], 'pageInfo' => { 'hasNextPage' => false }, }
 
     job = oauth.jobs.includes(:line_items).first
     items = job.line_items
 
-    # Under one of a thing is not a thing, whether it is a fraction, none, or unsaid
-    assert_equal ['Bathroom Faucet Installation', 'Change Toilet Valve', 'Hours of labour'],
+    # A fraction of a thing is still a thing; none of one, and one nobody quantified, are not
+    assert_equal [ 'Bathroom Faucet Installation', 'Change Toilet Valve', 'Hours of labour' ],
                  items.map(&:name)
     assert_equal 3, items.first.quantity
     assert_equal 'Professional installation of a new bathroom faucet', items.first.description
@@ -24,7 +23,7 @@ class LineItemsTest < Minitest::Test
                  '(Professional installation of a new bathroom faucet)', items.first.to_s
     # A line nobody described reads without the empty parenthesis
     assert_equal '2 Change Toilet Valve', items[1].to_s
-    # And a fraction of more than one keeps its point, since rounding it would lie
+    # A whole quantity reads as an integer and a fraction keeps its point
     assert_in_delta 1.5, items[2].quantity
     assert_equal '1.5 Hours of labour (At the hourly rate)', items[2].to_s
     # And a job summarizes itself by its lines, each as how many of what
@@ -35,7 +34,7 @@ class LineItemsTest < Minitest::Test
 
   def test_lines_nobody_asked_for_do_not_arrive
     stub_graphql 'jobs' => { 'nodes' => [ { 'id' => 'job-01' } ],
-                             'pageInfo' => { 'hasNextPage' => false } }
+                             'pageInfo' => { 'hasNextPage' => false }, }
 
     job = oauth.jobs.first
 

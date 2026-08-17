@@ -8,13 +8,13 @@ module Jbr
     # What to ask for wherever a record lists the lines it is made of.
     SELECTION = "lineItems { nodes { #{FIELDS.join ' '} } }"
 
-    # The lines worth reading out, from the nodes Jobber answered with. Less than one of a
-    # thing is not a thing a page says: Jobber lets a line be quantified at nothing, or at a
-    # fraction, and neither reads as work done.
+    # The lines worth reading out, from the nodes Jobber answered with. None of a thing is
+    # not a thing a page says, and neither is a line nobody quantified; a fraction of one is,
+    # since half an hour of labour is still labour.
     # @param nodes [Array<Hash>, nil] the lines as Jobber answered them, if it answered any.
-    # @return [Array<LineItem>] one per line quantified at one or more.
+    # @return [Array<LineItem>] one per line quantified at anything at all.
     def self.from(nodes)
-      nodes.to_a.map { |node| new node: node }.select { |item| item.quantity.to_f >= 1 }
+      nodes.to_a.map { |node| new node: node }.reject { |item| item.quantity.to_f.zero? }
     end
 
     # @return [Integer, Float, nil] how many of it the job is for.
@@ -32,8 +32,9 @@ module Jbr
 
   private
 
-    # Jobber answers a quantity as a Float, and a whole one reads as an Integer: `3 Faucets`
-    # rather than `3.0 Faucets`. A fraction keeps its point, since rounding it would lie.
+    # Jobber answers every quantity as a Float, and a whole one reads as an Integer:
+    # `3 Faucets` rather than `3.0 Faucets`. A fraction keeps its point — `3.5 Faucets` —
+    # since rounding it would lie about what was billed.
     def whole(number) = number && ((number % 1).zero? ? number.to_i : number)
 
     def described = ("(#{description})" if description.present?)
