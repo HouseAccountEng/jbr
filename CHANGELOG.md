@@ -1,3 +1,15 @@
+## [3.7.1] - 2026-08-17
+
+- [Fix] A refresh token Jobber will not take gives the credentials up, as it always should
+  have. Jobber answers that one in prose and with a 401 — `The provided refresh token is not
+  valid.` — where this gem only recognised the OAuth 2 `invalid_grant` in a JSON body, so it
+  read a dead grant as a bad moment: `invalid_at` was never set, the error escaped to the
+  caller, and an app that persists what it is told kept an authentication that could never work
+  again and retried it forever
+- [Change] Read the body rather than the status, deliberately. Jobber answers 401 to an app
+  whose own client id and secret are wrong just as readily, and giving credentials up over that
+  would disconnect every account at once over one misconfigured app
+
 ## [3.7.0] - 2026-08-17
 
 - [New] `store:`, for credentials several processes hold copies of. A queue of workers each

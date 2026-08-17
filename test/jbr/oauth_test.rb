@@ -33,35 +33,6 @@ class OAuthTest < Minitest::Test
     assert_nil credentials.invalid_at
   end
 
-  def test_a_refusal_to_refresh_invalidates_the_credentials
-    stub_graphql_failure status: 401, body: 'expired'
-    stub_refusal_to_refresh
-    credentials = oauth
-
-    assert_empty credentials.query('{ ok }')
-    assert credentials.invalid_at
-  end
-
-  # A token that may still work is worth more than a tidy failure: Jobber having a bad
-  # moment is not Jobber saying the grant is dead, and only the second may give it up.
-  def test_trouble_at_jobbers_end_leaves_the_credentials_alone
-    stub_graphql_failure status: 401, body: 'expired'
-    stub_request(:post, TOKEN_URL).to_return status: 500, body: 'Internal Server Error'
-    credentials = oauth
-
-    assert_raises(Jbr::Error) { credentials.query '{ ok }' }
-    assert_nil credentials.invalid_at
-  end
-
-  def test_a_refusal_jobber_did_not_name_is_trouble_rather_than_a_refusal
-    stub_graphql_failure status: 401, body: 'expired'
-    stub_request(:post, TOKEN_URL).to_return status: 400, body: '<html>Bad Request</html>'
-    credentials = oauth
-
-    assert_raises(Jbr::Error) { credentials.query '{ ok }' }
-    assert_nil credentials.invalid_at
-  end
-
   def test_delete_disconnects_the_app
     stub_graphql 'appDisconnect' => { 'app' => { 'name' => 'HouseAccount' } }
 

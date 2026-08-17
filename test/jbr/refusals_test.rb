@@ -1,7 +1,8 @@
 require 'test_helper'
 
-# What reaches a caller when Jobber will not answer. Nothing here waits or asks again: a
-# caller running this from a background job has a queue that will bring the whole job back,
+# What reaches a caller when Jobber will not answer — a query it prices too high, a token
+# endpoint that turns a grant down, a bad moment at its end. Nothing here waits or asks again:
+# a caller running this from a background job has a queue that will bring the whole job back,
 # which is worth more than a worker asleep holding a transaction open.
 class RefusalsTest < Minitest::Test
   def test_a_refusal_for_cost_says_what_the_query_would_have_cost
@@ -31,5 +32,59 @@ class RefusalsTest < Minitest::Test
 
     assert_equal 'Field does not exist', error.message
     assert_requested stub, times: 1
+  end
+
+  def test_a_refusal_to_refresh_invalidates_the_credentials
+    stub_graphql_failure status: 401, body: 'expired'
+    stub_refusal_to_refresh
+    credentials = oauth
+
+    assert_empty credentials.query('{ ok }')
+    assert credentials.invalid_at
+  end
+
+  # A token that may still work is worth more than a tidy failure: Jobber having a bad
+  # moment is not Jobber saying the grant is dead, and only the second may give it up.
+  def test_a_refresh_token_jobber_will_not_take_invalidates_the_credentials
+    stub_graphql_failure status: 401, body: 'expired'
+    # Jobber answers the token endpoint in prose and with a 401, not the 400 and the JSON the
+    # OAuth 2 word for this comes in
+    stub_request(:post, TOKEN_URL).
+      to_return status: 401, body: 'The provided refresh token is not valid.'
+    credentials = oauth
+
+    assert_empty credentials.query('{ ok }')
+    assert credentials.invalid_at
+  end
+
+  def test_trouble_at_jobbers_end_leaves_the_credentials_alone
+    stub_graphql_failure status: 401, body: 'expired'
+    stub_request(:post, TOKEN_URL).to_return status: 500, body: 'Internal Server Error'
+    credentials = oauth
+
+    assert_raises(Jbr::Error) { credentials.query '{ ok }' }
+    assert_nil credentials.invalid_at
+  end
+
+  def test_a_refusal_jobber_did_not_name_is_trouble_rather_than_a_refusal
+    stub_graphql_failure status: 401, body: 'expired'
+    stub_request(:post, TOKEN_URL).to_return status: 400, body: '<html>Bad Request</html>'
+    credentials = oauth
+
+    assert_raises(Jbr::Error) { credentials.query '{ ok }' }
+    assert_nil credentials.invalid_at
+  end
+
+  # Jobber answers 401 to an app whose own client id and secret are wrong, exactly as it does
+  # to a refresh token it will not take. Reading only the status would give up every account's
+  # grant at once over a misconfigured app, so the body is what tells the two apart.
+  def test_a_refusal_jobber_blames_the_app_for_leaves_the_grant_alone
+    stub_graphql_failure status: 401, body: 'expired'
+    stub_request(:post, TOKEN_URL).to_return status: 401,
+      body: 'The provided client id and secret do not match an existing application'
+    credentials = oauth
+
+    assert_raises(Jbr::Error) { credentials.query '{ ok }' }
+    assert_nil credentials.invalid_at
   end
 end

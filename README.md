@@ -67,10 +67,11 @@ Revoke credentials:
 oauth.delete
 ```
 
-Credentials go bad only when Jobber says so. A refused refresh — the `invalid_grant` Jobber
-names — sets `invalid_at` and answers queries with nothing. Anything else that goes wrong,
-including a 500 or a rate limit, raises `Jbr::Error` instead, because a token that may still
-work is worth more than a tidy failure:
+Credentials go bad only when Jobber says so of the grant itself: the `invalid_grant` it names,
+or the 401 it answers a refresh token it will not take. Either sets `invalid_at` and answers
+queries with nothing. Anything else that goes wrong raises `Jbr::Error` instead — a 500, a rate
+limit, and the 401 Jobber answers an app whose own client id and secret are wrong, which is
+every account's grant at once rather than this one's:
 
 ```ruby
 oauth.invalid_at # => 2026-08-13 11:02:41, or nil while the credentials are good
