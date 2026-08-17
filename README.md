@@ -26,6 +26,32 @@ Initialize with existing credentials:
 oauth = Jbr.oauth_for access_token:, refresh_token:, expires_at:, account_id:
 ```
 
+Where several processes hold copies of the same credentials — a queue of workers, each
+building its own — hand over a `store:` as well, and only one of them will ever spend the
+refresh token:
+
+```ruby
+oauth = Jbr.oauth_for account_id:, invalid_at:, store: credentials
+```
+
+The store is anything answering two methods. `exclusively` takes whatever lock the app keeps
+over those credentials and yields them *as they are right now*, read inside that lock; `write`
+records the ones Jobber handed back:
+
+```ruby
+def exclusively = with_lock { yield oauth_params }   # Active Record, in an app that has it
+
+def write(oauth) = update oauth: oauth
+```
+
+An expired access token is then refreshed once. Every other holder takes the lock, finds a
+token that is no longer the one it tried, adopts it, and asks Jobber nothing — where without a
+store each of them would spend a refresh token the first has already spent, and Jobber would
+call every one of those a dead grant.
+
+`exclusively` has to be exclusive against every **process** sharing the credentials, not just
+every thread: a `Mutex` satisfies this interface and fixes nothing on a fleet of workers.
+
 Access OAuth attributes:
 
 ```ruby
@@ -192,31 +218,23 @@ query never named a client.
 
 ### Rate limits
 
-Jobber holds an app to two limits at once: 2,500 requests every five minutes, and a bucket
-of query cost that drains as it is asked and refills at a rate it reports. Nothing has to be
-done about either — every request waits for itself:
-
-- It spaces itself 0.12 seconds from the request before, which is 2,500 spread evenly over
-  five minutes.
-- It reads `extensions.cost` off each answer, and where the bucket can no longer pay for a
-  page like the last one, it waits for the shortfall to refill at Jobber's own restore rate.
-
-A request that follows no other waits for nothing, so a single `find` is as quick as it ever
-was. Only a walk long enough to be a problem is slowed, and only by as much as it must be.
-
-Where Jobber refuses anyway, the refusal says what the query would have cost against what was
-available, and what happens next follows from those two numbers:
+Jobber holds an app to two limits at once: 2,500 requests every five minutes, and a bucket of
+query cost that drains as it is asked and refills at a rate it reports. This gem does nothing
+about either — it never sleeps, and it never asks a second time. What it does is say exactly
+what happened, so the caller can decide:
 
 ```
 Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)
 ```
 
-631 points short of a query the bucket holds five times over, so the shortfall is waited out —
-1.26 seconds at 500 a second — and the same question asked again, up to four times. Only a
-query costing more than the bucket *ever* holds is given up on, since no wait would help it;
-that one arrives as a `Jbr::Error` carrying the line above. Every connection this gem asks for
-is bounded, to keep a query on the affordable side of that: twenty lines to a job, and twenty
-jobs or visits to a page.
+That arrives as a `Jbr::Error`. 631 points short of a query the bucket holds five times over,
+which a second would have refilled — worth asking again. A cost above `maximumAvailable` is
+worth nothing but a smaller query. Either way the decision belongs to whoever called: from a
+background job, letting it fail so the queue brings it back is better than a worker asleep
+holding a transaction open.
+
+Every connection the gem asks for is bounded, to keep a query on the affordable side of that:
+twenty lines to a job, and twenty jobs or visits to a page.
 
 ### Events
 

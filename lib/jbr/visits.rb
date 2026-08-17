@@ -16,7 +16,24 @@ module Jbr
     # @return [Enumerator<Visit>] the visits that started before now.
     def past = walk until_now
 
+    # Shadows Enumerable#find on purpose, the way jobs do: a visit is reached by the ID Jobber
+    # files it under, not by asking every visit on the account whether it is the one.
+    # @param id [String] the Jobber ID of the visit.
+    # @return [Visit, nil] nil when Jobber has no visit under that ID.
+    def find(id)
+      node = @oauth.query(one, variables: { id: id })['visit']
+      Visit.new node: node if node
+    end
+
   private
+
+    def one
+      <<~GRAPHQL
+        query($id: EncodedId!) {
+          visit(id: $id) { #{FIELDS} #{selections} }
+        }
+      GRAPHQL
+    end
 
     # Twenty a page, the same as jobs: Jobber prices a query by its page size, and what an
     # includes brings back is charged for on top of every row of it.

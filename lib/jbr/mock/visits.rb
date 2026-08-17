@@ -10,6 +10,9 @@ module Jbr
     # @return [Enumerator<Mock::Visit>] those it dated before now.
     def past = mocked Jbr.mock.visits.select { |visit| started? visit }
 
+    # @return [Mock::Visit] the visit the app listed under that ID.
+    def find(id) = Mock::Visit.new node: listed(id)
+
   private
 
     def mocked(visits)
@@ -17,5 +20,7 @@ module Jbr
     end
 
     def started?(visit) = visit[:starts_at] ? visit[:starts_at] <= Time.now : false
+
+    def listed(id) = Jbr.mock.visits.to_a.find { |visit| visit[:id] == id }.to_h
   end
 end

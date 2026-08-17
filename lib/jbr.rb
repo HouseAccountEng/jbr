@@ -11,7 +11,6 @@ require 'active_support/core_ext/array/conversions'
 
 require 'graphql/error'
 require 'graphql/unauthorized'
-require 'graphql/throttled'
 require 'graphql/client'
 
 require 'jbr/mock'
@@ -20,14 +19,13 @@ require 'jbr/url'
 require 'jbr/error'
 require 'jbr/refused'
 require 'jbr/token'
+require 'jbr/refreshing'
 # Phone before Cliental, and Cliental before the records that include it: what each asks
 # Jobber for about a client is built as they load.
 require 'jbr/phone'
 require 'jbr/cliental'
 require 'jbr/named'
 require 'jbr/resource'
-require 'jbr/throttle'
-require 'jbr/asking'
 require 'jbr/request'
 require 'jbr/oauth'
 

@@ -1,3 +1,33 @@
+## [3.7.0] - 2026-08-17
+
+- [New] `store:`, for credentials several processes hold copies of. A queue of workers each
+  building its own `oauth_for` used to refresh a hundred times over when the access token
+  expired, each spending a refresh token the first had already spent — and Jobber calls a
+  spent one a dead grant, so all but one of them would mark the credentials invalid and the
+  whole connection would be discarded. With a store the refresh happens under the app's own
+  lock, against the credentials as they are at that moment, and a holder that finds the token
+  already replaced adopts it without asking Jobber anything
+- [New] `Jbr::Visits#find`, reaching one visit by the ID Jobber files it under, the way jobs
+  already could. An app importing many of them can walk the account for IDs alone and then
+  fetch each visit on its own
+- [Change] The refresh moved to `Jbr::Refreshing`, which is what `OAuth` includes to do it
+
+## [3.6.2] - 2026-08-17
+
+- [Change] Nothing in this gem sleeps any more. 3.6.0 waited out a refusal for cost and asked
+  again, and 3.2.0 spaced every request 0.12s from the one before — both of which put a worker
+  to sleep, often with a transaction open around it. A caller asking from a background job has
+  a queue that will bring the whole job back later, and that is worth more than a held worker,
+  so a refusal is raised and the decision is the caller's. `Jbr::Throttle` and
+  `GraphQL::Throttled` go with the waiting; the numbers a refusal reports stay in its message
+- [Fix] A mocked `find` answers with the job on `Jbr.mock.jobs` filed under that ID, falling
+  back to `Jbr.mock.job` as before. An app that lists jobs and then looks one of them up — one
+  request for the IDs, then one job at a time — used to get whichever single job it had mocked,
+  whatever ID it asked for
+- [Change] Without the request spacing, an app walking many pages is on its own about Jobber's
+  other limit, 2,500 requests every five minutes. Nothing here has come close to it: the
+  spacing was insurance against a walk that no longer exists
+
 ## [3.6.1] - 2026-08-17
 
 - [Fix] 3.6.0 shipped without the two files it added, `graphql/throttled` and `jbr/asking`, so

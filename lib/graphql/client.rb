@@ -16,37 +16,21 @@ module GraphQL
 
     # @param query [String] the GraphQL query string.
     # @param variables [Hash] the variables to interpolate into the query.
-    # @yield [Hash] the `extensions` the endpoint answered beside the data, where it did.
     # @return [Hash] the `data` portion of the GraphQL response.
     def query(query, variables: {})
       response = Net::HTTP.post @endpoint, { query:, variables: }.to_json, request_headers
       raise Unauthorized, response.body if response.code == '401'
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
       body = JSON.parse(response.body)
-      # Before the refusal, not after it: an endpoint that reports what it will still answer
-      # reports it when it says no, which is when a caller most needs to know.
-      yield body['extensions'] if block_given?
-      raise refusal_for(body), refusal(body) if body['errors'].present?
+      raise Error, refusal(body) if body['errors'].present?
       body.fetch('data')
     end
 
   private
 
-    # Refused for cost, or refused for the query. An endpoint that priced the query above what
-    # was left says so by naming the code, and says it again in the two numbers it reports —
-    # either is enough, since only one of them is documented and only one has been seen.
-    def refusal_for(body)
-      cost = body['extensions'].to_h['cost'].to_h
-      available = cost['throttleStatus'].to_h['currentlyAvailable']
-      coded = body['errors'].any? { |error| error.to_h.dig('extensions', 'code') == 'THROTTLED' }
-      priced = available && cost['requestedQueryCost'].to_f > available.to_f
-
-      coded || priced ? Throttled : Error
-    end
-
     # What the endpoint refused, and — where it priced the refusal — what the query would have
     # cost against what was available. `Throttled` on its own leaves a caller unable to tell a
-    # query too big to ever run from a bucket that only needed a moment.
+    # query too big to ever run from a bucket that a moment would have refilled.
     def refusal(body)
       message = body['errors'].map { |error| error['message'] }.join '; '
       cost = body['extensions'].to_h['cost'].to_h

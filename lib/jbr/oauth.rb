@@ -1,7 +1,7 @@
 module Jbr
   # Credentials for one Jobber account, and the gateway to all they read or write.
   class OAuth
-    include Asking
+    include Refreshing
 
     # The mutation that revokes the app on the account.
     DISCONNECT_MUTATION = <<~GRAPHQL
@@ -13,13 +13,15 @@ module Jbr
       }
     GRAPHQL
 
-    # @param credentials [Hash] the tokens, their expiry, the account and when it went bad.
+    # @param credentials [Hash] the tokens, their expiry, the account, when it went bad, and
+    #   the `store:` these are kept in, where processes share them. See {Refreshing}.
     def initialize(credentials = {})
       @access_token = credentials[:access_token]
       @refresh_token = credentials[:refresh_token]
       @expires_at = credentials[:expires_at]
       @account_id = credentials[:account_id]
       @invalid_at = credentials[:invalid_at]
+      @store = credentials[:store]
     end
 
     # The credentials as Jobber last gave them, plus the moment a refusal to refresh landed.
@@ -35,6 +37,22 @@ module Jbr
     def quotes = Quote.new oauth: self
     def requests = Request.new oauth: self
     def visits = Visits.new oauth: self
+
+    # Run a statement, refreshing a stale token. Nothing here ever sleeps: where Jobber holds
+    # the app to a limit it says so, and a caller asking from a background job has a queue that
+    # will bring the whole job back later — which is worth more than a worker asleep holding a
+    # transaction open.
+    # @return [Hash] the data Jobber answered, or empty when the credentials are dead.
+    def query(statement, variables: {})
+      client.query statement, variables: variables
+    rescue GraphQL::Unauthorized
+      refresh ? retry : {}
+    rescue GraphQL::Error => error
+      # The transport's own class never leaves the gem: a caller told to rescue `Jbr::Error`
+      # was not catching a throttle, a 500 or an unreadable answer, and had its own job blow
+      # up instead of hearing that Jobber would not answer.
+      raise Error, error.message
+    end
 
     # Delete a token. If the token is invalid, do nothing.
     def delete
@@ -63,16 +81,6 @@ module Jbr
     end
 
   private
-
-    def refresh
-      output = self.class.post refresh_token: @refresh_token, grant_type: 'refresh_token'
-      @access_token = output[:access_token]
-      @refresh_token = output[:refresh_token]
-      @expires_at = output[:expires_at]
-    rescue Refused
-      @invalid_at = Time.now
-      false
-    end
 
     def client
       GraphQL::Client.new endpoint: 'https://api.getjobber.com/api/graphql',
