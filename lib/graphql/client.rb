@@ -26,11 +26,23 @@ module GraphQL
       # Before the refusal, not after it: an endpoint that reports what it will still answer
       # reports it when it says no, which is when a caller most needs to know.
       yield body['extensions'] if block_given?
-      raise Error, refusal(body) if body['errors'].present?
+      raise refusal_for(body), refusal(body) if body['errors'].present?
       body.fetch('data')
     end
 
   private
+
+    # Refused for cost, or refused for the query. An endpoint that priced the query above what
+    # was left says so by naming the code, and says it again in the two numbers it reports —
+    # either is enough, since only one of them is documented and only one has been seen.
+    def refusal_for(body)
+      cost = body['extensions'].to_h['cost'].to_h
+      available = cost['throttleStatus'].to_h['currentlyAvailable']
+      coded = body['errors'].any? { |error| error.to_h.dig('extensions', 'code') == 'THROTTLED' }
+      priced = available && cost['requestedQueryCost'].to_f > available.to_f
+
+      coded || priced ? Throttled : Error
+    end
 
     # What the endpoint refused, and — where it priced the refusal — what the query would have
     # cost against what was available. `Throttled` on its own leaves a caller unable to tell a

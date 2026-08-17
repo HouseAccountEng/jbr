@@ -204,11 +204,19 @@ done about either — every request waits for itself:
 A request that follows no other waits for nothing, so a single `find` is as quick as it ever
 was. Only a walk long enough to be a problem is slowed, and only by as much as it must be.
 
-Where Jobber refuses for cost anyway, the `Jbr::Error` raised says what the query would have
-cost against what was available — `Throttled (cost 12400, 9500 of 10000 available, restoring
-500/s)` — so a query too big to ever run reads apart from a bucket that needed a moment. Every
-connection this gem asks for is bounded, because Jobber prices an unbounded one at its own
-maximum: twenty lines to a job, and twenty jobs or visits to a page.
+Where Jobber refuses anyway, the refusal says what the query would have cost against what was
+available, and what happens next follows from those two numbers:
+
+```
+Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)
+```
+
+631 points short of a query the bucket holds five times over, so the shortfall is waited out —
+1.26 seconds at 500 a second — and the same question asked again, up to four times. Only a
+query costing more than the bucket *ever* holds is given up on, since no wait would help it;
+that one arrives as a `Jbr::Error` carrying the line above. Every connection this gem asks for
+is bounded, to keep a query on the affordable side of that: twenty lines to a job, and twenty
+jobs or visits to a page.
 
 ### Events
 

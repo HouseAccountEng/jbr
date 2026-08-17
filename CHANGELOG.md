@@ -1,3 +1,20 @@
+## [3.6.0] - 2026-08-17
+
+- [Fix] A refusal for cost the bucket can recover from is waited out and asked again, up to
+  four times, rather than raised. A walk of many pages drains the bucket faster than it
+  refills and gets `Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)` — 631
+  points short of a query the bucket holds five times over. The refusal prices the query, so
+  the throttle already knows the shortfall: 1.26 seconds at 500 a second, and the same
+  question is answered
+- [Change] Only a query costing more than the bucket *ever* holds is given up on, since
+  waiting cannot help it. Where Jobber names no ceiling, one wait is tried rather than the
+  worst assumed
+- [New] `GraphQL::Throttled`, a `GraphQL::Error` for a query refused over what it costs rather
+  than over anything about the query. It never leaves the gem — a caller still sees
+  `Jbr::Error` — but it is what tells the two refusals apart inside it
+- [Change] What credentials do when they ask Jobber something is `Jbr::Asking`, mixed into
+  `Jbr::OAuth`, which was over a hundred lines with the retry in it
+
 ## [3.5.1] - 2026-08-17
 
 - [Change] A line item is how many of what, and nothing else. `description` was answered and

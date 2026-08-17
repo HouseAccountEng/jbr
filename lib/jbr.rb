@@ -11,6 +11,7 @@ require 'active_support/core_ext/array/conversions'
 
 require 'graphql/error'
 require 'graphql/unauthorized'
+require 'graphql/throttled'
 require 'graphql/client'
 
 require 'jbr/mock'
@@ -26,6 +27,7 @@ require 'jbr/cliental'
 require 'jbr/named'
 require 'jbr/resource'
 require 'jbr/throttle'
+require 'jbr/asking'
 require 'jbr/request'
 require 'jbr/oauth'
 

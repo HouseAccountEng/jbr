@@ -1,6 +1,8 @@
 module Jbr
   # Credentials for one Jobber account, and the gateway to all they read or write.
   class OAuth
+    include Asking
+
     # The mutation that revokes the app on the account.
     DISCONNECT_MUTATION = <<~GRAPHQL
       mutation Disconnect {
@@ -34,20 +36,6 @@ module Jbr
     def requests = Request.new oauth: self
     def visits = Visits.new oauth: self
 
-    # Run a statement, waiting for what Jobber will still answer and refreshing a stale token.
-    # @return [Hash] the data Jobber answered, or empty when the credentials are dead.
-    def query(statement, variables: {})
-      throttle.wait
-      client.query(statement, variables: variables) { |extensions| throttle.read extensions }
-    rescue GraphQL::Unauthorized
-      refresh ? retry : {}
-    rescue GraphQL::Error => error
-      # The transport's own class never leaves the gem: a caller told to rescue `Jbr::Error`
-      # was not catching a throttle, a 500 or an unreadable answer, and had its own job blow
-      # up instead of hearing that Jobber would not answer.
-      raise Error, error.message
-    end
-
     # Delete a token. If the token is invalid, do nothing.
     def delete
       client.query DISCONNECT_MUTATION
@@ -75,8 +63,6 @@ module Jbr
     end
 
   private
-
-    def throttle = @throttle ||= Throttle.new
 
     def refresh
       output = self.class.post refresh_token: @refresh_token, grant_type: 'refresh_token'

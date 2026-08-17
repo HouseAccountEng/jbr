@@ -22,6 +22,18 @@ class OAuthTest < Minitest::Test
     assert_equal 'invalid_grant', error.message
   end
 
+  def test_a_failure_that_is_not_about_cost_is_raised_rather_than_asked_again
+    stub = stub_request(:post, GRAPHQL_URL).
+      to_return body: { errors: [ { message: 'Field does not exist' } ] }.to_json
+
+    # Jobber's own class never leaves the gem, so a caller rescuing Jbr::Error catches this
+    # the way the README says it will. And asking again would only be told the same thing
+    error = assert_raises(Jbr::Error) { oauth.query '{ nope }' }
+
+    assert_equal 'Field does not exist', error.message
+    assert_requested stub, times: 1
+  end
+
   def test_an_expired_token_is_refreshed_and_the_query_retried
     stub_request(:post, GRAPHQL_URL).
       to_return({ status: 401, body: 'expired' }, { body: { data: { 'ok' => true } }.to_json })

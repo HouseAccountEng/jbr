@@ -25,8 +25,16 @@ module Jbr
       # and only an answered one reports an actual.
       @cost = (cost['actualQueryCost'] || cost['requestedQueryCost']).to_f
       @available = status['currentlyAvailable'].to_f
+      @maximum = status['maximumAvailable'].to_f
       @restore_rate = status['restoreRate'].to_f
     end
+
+    # Whether the bucket could ever pay for the query it last priced. A refusal is worth
+    # waiting out where it could: the shortfall refills and the same query goes through. Where
+    # the query costs more than the bucket ever holds, no wait will do — and where Jobber said
+    # nothing about the ceiling, one attempt at waiting is cheaper than assuming the worst.
+    # @return [Boolean] false only where the ceiling is known and the query is over it.
+    def affordable? = !@maximum.to_f.positive? || @cost.to_f <= @maximum
 
   private
 

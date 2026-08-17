@@ -5,6 +5,17 @@ require 'test_helper'
 class ThrottleTest < Minitest::Test
   def setup = @throttle = Jbr::Throttle.new
 
+  # A refusal for cost as Jobber answers one: what the query would have cost, and the bucket
+  # it was priced against.
+  def throttled(requested:, available:, maximum:, restore: 500)
+    { errors: [ { message: 'Throttled', extensions: { code: 'THROTTLED' } } ],
+      extensions: { cost: { requestedQueryCost: requested,
+                            throttleStatus: { maximumAvailable: maximum,
+                                              currentlyAvailable: available,
+                                              restoreRate: restore, }, } },
+    }.to_json
+  end
+
   def test_the_first_request_waits_for_nothing
     assert_in_delta 0, @throttle.wait
   end
@@ -41,38 +52,33 @@ class ThrottleTest < Minitest::Test
     assert_in_delta 0, @throttle.wait
   end
 
-  def test_a_refusal_for_cost_says_what_the_query_would_have_cost
-    throttled = { errors: [ { message: 'Throttled', extensions: { code: 'THROTTLED' } } ],
-                  extensions: { cost: { requestedQueryCost: 12_400,
-                                        throttleStatus: { maximumAvailable: 10_000,
-                                                          currentlyAvailable: 9_500,
-                                                          restoreRate: 500, }, } },
-    }
-    stub_request(:post, JobberStubs::GRAPHQL_URL).to_return body: throttled.to_json
+  def test_a_query_costing_more_than_the_bucket_holds_is_refused_rather_than_waited_on
+    stub = stub_request(:post, JobberStubs::GRAPHQL_URL).to_return body: throttled(
+      requested: 12_400, available: 9_500, maximum: 10_000,
+    )
 
-    # A caller told to rescue Jbr::Error hears about it, rather than the transport's own class
-    # escaping into their job. And the message says whether waiting could ever have helped
+    # Nothing refills to 12,400 in a bucket of 10,000, so asking again would only be refused
+    # again. A caller told to rescue Jbr::Error hears about it, with the numbers to see why
     error = assert_raises(Jbr::Error) { oauth.jobs.to_a }
 
     assert_equal 'Throttled (cost 12400, 9500 of 10000 available, restoring 500/s)',
                  error.message
+    assert_requested stub, times: 1
   end
 
-  def test_a_refusal_prices_the_query_the_next_one_waits_for
-    throttled = { errors: [ { message: 'Throttled' } ],
-                  extensions: { cost: { requestedQueryCost: 100,
-                                        throttleStatus: { currentlyAvailable: 60,
-                                                          restoreRate: 400, }, } },
-    }
-    stub_request(:post, JobberStubs::GRAPHQL_URL).to_return body: throttled.to_json
-    credentials = oauth
-    assert_raises(Jbr::Error) { credentials.jobs.to_a }
+  def test_a_refusal_the_bucket_can_recover_from_is_waited_out_and_asked_again
+    page = { 'nodes' => [], 'pageInfo' => { 'hasNextPage' => false } }
+    stub = stub_request(:post, JobberStubs::GRAPHQL_URL).
+      to_return({ body: throttled(requested: 100, available: 60, maximum: 10_000) },
+                { body: { data: { 'jobs' => page } }.to_json })
 
-    # 40 points short at 400 a second, learned from a query Jobber priced but never answered
+    # 40 points short of a query the bucket holds twenty times over: wait for the shortfall to
+    # refill at the rate Jobber reports, then ask the same question and be answered
     started = Time.now
-    assert_raises(Jbr::Error) { credentials.jobs.to_a }
 
-    assert_in_delta 0.1, Time.now - started, 0.05
+    assert_empty oauth.jobs.to_a
+    assert_operator Time.now - started, :>=, 0.1
+    assert_requested stub, times: 2
   end
 
   def test_a_walk_paces_itself_between_pages
