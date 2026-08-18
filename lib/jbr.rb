@@ -36,6 +36,7 @@ require 'jbr/account'
 require 'jbr/property'
 require 'jbr/properted'
 require 'jbr/includable'
+require 'jbr/listable'
 # LineItem before Itemized, and both before Job: the lines a job is made of are asked for
 # by a constant the include reads as it loads.
 require 'jbr/line_item'

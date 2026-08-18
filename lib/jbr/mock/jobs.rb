@@ -1,24 +1,25 @@
 module Jbr
-  # The jobs an app under test asked {Jbr.mock} to answer with.
+  # The jobs an app under test asked {Jbr.mock} to answer with. Only the walk is mocked:
+  # narrowing a list, and reading it as records or as IDs, is the same code a real one runs.
   class Mock::Jobs < Jobs
     # The job filed under that ID where the app listed one, and otherwise the single job it
     # named — which is every app that mocks a lookup without mocking a list.
     # @return [Mock::Job] the job asked for.
     def find(id) = Mock::Job.new node: listed(id) || Jbr.mock.job
 
-    # @return [Enumerator<Mock::Job>] every job the app named.
-    def each(&) = mocked(Jbr.mock.jobs).each(&)
-
-    # @return [Enumerator<Mock::Job>] those it dated from now on, and any it left undated.
-    def upcoming = mocked Jbr.mock.jobs.reject { |job| started? job }
-
-    # @return [Enumerator<Mock::Job>] those it dated before now.
-    def past = mocked Jbr.mock.jobs.select { |job| started? job }
-
   private
 
-    def mocked(jobs)
-      Enumerator.new { |yielder| jobs.each { |job| yielder << Mock::Job.new(node: job) } }
+    def walk(_statement)
+      Enumerator.new { |yielder| selected.each { |job| yielder << Mock::Job.new(node: job) } }
+    end
+
+    # The half of the schedule the list was narrowed to, from what the app dated each job.
+    # One it left undated is one nothing has started, so it counts as upcoming.
+    def selected
+      return Jbr.mock.jobs unless @filter
+
+      started = @filter.dig(:startAt, :before).present?
+      Jbr.mock.jobs.select { |job| started?(job) == started }
     end
 
     def started?(job) = job[:scheduled_at] ? job[:scheduled_at] <= Time.now : false

@@ -1,22 +1,23 @@
 module Jbr
-  # The visits an app under test asked {Jbr.mock} to answer with.
+  # The visits an app under test asked {Jbr.mock} to answer with. Only the walk is mocked:
+  # narrowing a list, and reading it as records or as IDs, is the same code a real one runs.
   class Mock::Visits < Visits
-    # @return [Enumerator<Mock::Visit>] every visit the app named.
-    def each(&) = mocked(Jbr.mock.visits).each(&)
-
-    # @return [Enumerator<Mock::Visit>] those it dated from now on, and any it left undated.
-    def upcoming = mocked Jbr.mock.visits.reject { |visit| started? visit }
-
-    # @return [Enumerator<Mock::Visit>] those it dated before now.
-    def past = mocked Jbr.mock.visits.select { |visit| started? visit }
-
     # @return [Mock::Visit] the visit the app listed under that ID.
     def find(id) = Mock::Visit.new node: listed(id)
 
   private
 
-    def mocked(visits)
-      Enumerator.new { |yielder| visits.each { |visit| yielder << Mock::Visit.new(node: visit) } }
+    def walk(_statement)
+      Enumerator.new { |yielder| selected.each { |it| yielder << Mock::Visit.new(node: it) } }
+    end
+
+    # The half of the schedule the list was narrowed to, from what the app dated each visit.
+    # One it left undated is one nothing has started, so it counts as upcoming.
+    def selected
+      return Jbr.mock.visits unless @filter
+
+      started = @filter.dig(:startAt, :before).present?
+      Jbr.mock.visits.select { |visit| started?(visit) == started }
     end
 
     def started?(visit) = visit[:starts_at] ? visit[:starts_at] <= Time.now : false

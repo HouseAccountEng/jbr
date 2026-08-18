@@ -113,13 +113,14 @@ job.completed_at # => 2026-05-18 11:36:13
 
 Or walk the account's jobs, oldest first. Jobber is asked for a page at a time, and only
 once the page before it runs out, so `first` costs one request where `to_a` costs as many
-as the account has pages. A walk paces itself, so a long one is never refused: see
-[Rate limits](#rate-limits).
+as the account has pages. A walk is priced by what its pages carry, and a long one can be
+refused for it: see [Rate limits](#rate-limits).
 
 ```ruby
 jobs = oauth.jobs # => an Enumerable of every job, nothing fetched yet
-oauth.jobs.past # => an Enumerator of the ones dated before now
-oauth.jobs.upcoming # => an Enumerator of the ones dated from now on
+oauth.jobs.past # => the ones dated before now, nothing fetched yet
+oauth.jobs.upcoming # => the ones dated from now on, nothing fetched yet
+oauth.jobs.past.ids # => %w[Z2lkOi8vS ...], every page of them, and nothing else about them
 
 job = jobs.first
 job.name # => 'Furnace tune-up', or the job's ID where nobody titled it. Never nil or empty
@@ -175,8 +176,9 @@ Walk the account's visits, oldest first, the same way as its jobs:
 
 ```ruby
 visits = oauth.visits # => an Enumerable of every visit, nothing fetched yet
-oauth.visits.upcoming # => an Enumerator of the ones dated from now on
-oauth.visits.past # => an Enumerator of the ones dated before now
+oauth.visits.upcoming # => the ones dated from now on, nothing fetched yet
+oauth.visits.past # => the ones dated before now, nothing fetched yet
+oauth.visits.upcoming.ids # => %w[Z2lkOi8vS ...], every page of them, and nothing else
 
 visit = visits.first
 visit.id # => 'Z2lkOi8vS'
@@ -246,6 +248,15 @@ holding a transaction open.
 
 Every connection the gem asks for is bounded, to keep a query on the affordable side of that:
 twenty lines to a job, and twenty jobs or visits to a page.
+
+`ids` is the cheap way to walk an account. It asks for the ID and nothing else, which prices
+a row at a fraction of a record and buys a hundred of them to a page — so five times the
+account is read for a fraction of the budget. Reach for it where each record is then read on
+its own with `find`, one background job at a time:
+
+```ruby
+oauth.jobs.past.ids.each { |id| ImportJob.perform_later id }
+```
 
 ### Events
 
