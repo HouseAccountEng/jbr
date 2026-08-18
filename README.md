@@ -111,8 +111,10 @@ job.scheduled_at # => 2026-05-14 23:02:52
 job.completed_at # => 2026-05-18 11:36:13
 ```
 
-Or walk the account's jobs, oldest first. Jobber is asked for a page at a time, and only
-once the page before it runs out, so `first` costs one request where `to_a` costs as many
+Or walk the account's jobs, oldest first. Either half of the schedule takes how much of it
+you meant — a duration, measured from the same now the half is split at — and a walk that
+stops at a boundary reads only the pages up to it. Jobber is asked for a page at a time, and
+only once the page before it runs out, so `first` costs one request where `to_a` costs as many
 as the account has pages. A walk is priced by what its pages carry, and a long one can be
 refused for it: see [Rate limits](#rate-limits).
 
@@ -120,6 +122,7 @@ refused for it: see [Rate limits](#rate-limits).
 jobs = oauth.jobs # => an Enumerable of every job, nothing fetched yet
 oauth.jobs.past # => the ones dated before now, nothing fetched yet
 oauth.jobs.upcoming # => the ones dated from now on, nothing fetched yet
+oauth.jobs.past(1.year) # => only as far back as a year, which is fewer pages to read
 oauth.jobs.past.ids # => %w[Z2lkOi8vS ...], every page of them, and nothing else about them
 
 job = jobs.first
@@ -178,6 +181,7 @@ Walk the account's visits, oldest first, the same way as its jobs:
 visits = oauth.visits # => an Enumerable of every visit, nothing fetched yet
 oauth.visits.upcoming # => the ones dated from now on, nothing fetched yet
 oauth.visits.past # => the ones dated before now, nothing fetched yet
+oauth.visits.upcoming(3.months) # => only as far ahead as three months
 oauth.visits.upcoming.ids # => %w[Z2lkOi8vS ...], every page of them, and nothing else
 
 visit = visits.first

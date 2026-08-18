@@ -19,11 +19,21 @@ module Jbr
     # starts, and a page is read only once the one before it runs out.
     def each(&) = walk(page).each(&)
 
+    # @param within [ActiveSupport::Duration, Numeric, nil] how far ahead to look, or nil for
+    #   as far ahead as the account is scheduled.
     # @return [Listable] the same list, narrowed to what is scheduled from now on.
-    def upcoming = narrowed from_now
+    def upcoming(within = nil)
+      now = Time.now
+      narrowed after: now, before: (now + within if within)
+    end
 
+    # @param within [ActiveSupport::Duration, Numeric, nil] how far back to look, or nil for
+    #   as far back as the account goes.
     # @return [Listable] the same list, narrowed to what started before now.
-    def past = narrowed until_now
+    def past(within = nil)
+      now = Time.now
+      narrowed before: now, after: (now - within if within)
+    end
 
     # The ID Jobber files each record under, and nothing else about it: the cheapest question
     # an account can be walked with, and the one to ask where every record is then read on its
@@ -33,13 +43,26 @@ module Jbr
 
   private
 
-    def narrowed(filter) = self.class.new(oauth: @oauth, includes: @includes, filter: filter)
-
     # The two halves of a schedule, split at the moment they are asked for rather than per
     # page: read page by page the boundary would slide, and something could cross it unseen.
-    def from_now = { startAt: { after: Time.now.iso8601 } }
+    # The same moment is the near end of a window, so the far end is measured from it too.
+    def narrowed(after: nil, before: nil)
+      bounds = { after: after&.iso8601, before: before&.iso8601 }.compact
+      self.class.new oauth: @oauth, includes: @includes, filter: { startAt: bounds }
+    end
 
-    def until_now = { startAt: { before: Time.now.iso8601 } }
+    # Whether a moment falls in the stretch of the schedule the list was narrowed to, for
+    # anything answering one without asking Jobber. A record with no moment at all is in an
+    # open-ended upcoming list, since nothing has started it, and in no window, since a window
+    # is a stretch it would have to have fallen in.
+    def scheduled?(at)
+      return true unless @filter
+
+      after, before = @filter[:startAt].values_at :after, :before
+      return before.nil? unless at
+
+      (after.nil? || at >= Time.iso8601(after)) && (before.nil? || at <= Time.iso8601(before))
+    end
 
     # Every record a paged query answers, one at a time, a page read only once the one before
     # it runs out. The filter is data: narrowed to nothing, the query narrows nothing.

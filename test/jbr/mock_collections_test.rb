@@ -55,6 +55,8 @@ class MockCollectionsTest < Minitest::Test
     # The one the app left untitled answers to its ID, since something has to name it
     assert_equal 'job-02', credentials.jobs.past.first.name
     assert_equal %w[job-02], credentials.jobs.past.map(&:id)
+    # And a window narrows the half further: the one dated an hour ago is not in the last minute
+    assert_empty credentials.jobs.past(60).map(&:id)
     assert_equal %w[job-02 job-01], credentials.jobs.map(&:id)
   end
 
