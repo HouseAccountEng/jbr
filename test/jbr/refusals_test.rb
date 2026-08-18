@@ -14,11 +14,15 @@ class RefusalsTest < Minitest::Test
                                               restoreRate: 500, }, } },
     }.to_json
 
-    # Nothing waits and nothing asks again. The numbers are for whoever reads the log, and
-    # the queue that brings a background job back is what will ask a second time
-    error = assert_raises(Jbr::Error) { oauth.query '{ ok }' }
+    # Nothing waits and nothing asks again here. What the caller gets is the kind of error it
+    # is, and the numbers to decide with: a cost under the maximum is one waiting will pay for
+    error = assert_raises(Jbr::Retriable) { oauth.query '{ ok }' }
 
     assert_equal 'Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)', error.message
+    assert_equal 1_885, error.cost
+    assert_equal 1_254, error.available
+    assert_equal 10_000, error.maximum
+    assert_equal 500, error.restore_rate
     assert_requested stub, times: 1
   end
 
@@ -29,6 +33,7 @@ class RefusalsTest < Minitest::Test
     # Jobber's own class never leaves the gem, so a caller rescuing Jbr::Error catches this
     # the way the README says it will. And asking again would only be told the same thing
     error = assert_raises(Jbr::Error) { oauth.query '{ nope }' }
+    refute_kind_of Jbr::Retriable, error
 
     assert_equal 'Field does not exist', error.message
     assert_requested stub, times: 1

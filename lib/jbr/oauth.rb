@@ -47,6 +47,8 @@ module Jbr
       client.query statement, variables: variables
     rescue GraphQL::Unauthorized
       refresh ? retry : {}
+    rescue GraphQL::Throttled => error
+      raise Retriable.new(error.message, error.cost)
     rescue GraphQL::Error => error
       # The transport's own class never leaves the gem: a caller told to rescue `Jbr::Error`
       # was not catching a throttle, a 500 or an unreadable answer, and had its own job blow

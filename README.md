@@ -228,6 +228,16 @@ what happened, so the caller can decide:
 Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)
 ```
 
+That one is a `Jbr::Retriable`, a `Jbr::Error` for a refusal worth asking again, carrying the
+numbers to decide with:
+
+```ruby
+error.cost # => 1885, what the query was priced at
+error.available # => 1254, what the bucket held when it was asked
+error.maximum # => 10000, what the bucket holds when full — a cost above it never fits
+error.restore_rate # => 500, points a second
+```
+
 That arrives as a `Jbr::Error`. 631 points short of a query the bucket holds five times over,
 which a second would have refilled — worth asking again. A cost above `maximumAvailable` is
 worth nothing but a smaller query. Either way the decision belongs to whoever called: from a

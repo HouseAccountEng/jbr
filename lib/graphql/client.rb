@@ -22,11 +22,22 @@ module GraphQL
       raise Unauthorized, response.body if response.code == '401'
       raise Error, response.body unless response.is_a? Net::HTTPSuccess
       body = JSON.parse(response.body)
-      raise Error, refusal(body) if body['errors'].present?
+      raise refusal_for(body) if body['errors'].present?
       body.fetch('data')
     end
 
   private
+
+    # Refused over cost where the endpoint names the code for it, or prices the query above
+    # what it says was left. Anything else is a refusal of the query itself.
+    def refusal_for(body)
+      cost = body['extensions'].to_h['cost'].to_h
+      available = cost['throttleStatus'].to_h['currentlyAvailable']
+      coded = body['errors'].any? { |error| error.to_h.dig('extensions', 'code') == 'THROTTLED' }
+      priced = available && cost['requestedQueryCost'].to_f > available.to_f
+
+      coded || priced ? Throttled.new(refusal(body), cost) : Error.new(refusal(body))
+    end
 
     # What the endpoint refused, and — where it priced the refusal — what the query would have
     # cost against what was available. `Throttled` on its own leaves a caller unable to tell a

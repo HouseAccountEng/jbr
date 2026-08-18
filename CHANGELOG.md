@@ -1,3 +1,12 @@
+## [3.8.0] - 2026-08-18
+
+- [New] `Jbr::Retriable`, a `Jbr::Error` for a query Jobber refused over what it costs rather
+  than over anything about the query. Every refusal read alike before, so an app had nothing to
+  branch on: the one worth asking again a moment later looked exactly like the one that will
+  say the same thing forever. It carries what Jobber reported it with — `cost`, `available`,
+  `maximum` and `restore_rate` — so a caller can tell a bucket that needed a second from a
+  query too big to ever fit in it
+
 ## [3.7.2] - 2026-08-17
 
 - [Change] Jobber's token endpoint answers in prose, so that is all this reads. 3.7.1 kept a
