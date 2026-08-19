@@ -12,7 +12,11 @@ class JobsTest < Minitest::Test
                                             'jobStatus' => 'archived', 'total' => 260.0,
                                             'client' => client,
                                             'property' => { 'id' => 'property-01',
-                                              'address' => { 'street1' => '1 Main St' }, },
+                                              'address' => { 'street1' => '1 Main St',
+                                                'coordinates' => {
+                                                  'latitude' => 35.77,
+                                                  'longitude' => -78.63,
+                                                }, }, },
                                             'createdAt' => '2026-08-08T11:00:00Z',
                                             'startAt' => '2026-08-09T14:00:00Z',
                                             'completedAt' => '2026-08-10T09:00:00Z', } ],
@@ -36,6 +40,8 @@ class JobsTest < Minitest::Test
     assert_equal '5553335555', job.client.phone
     assert_equal 'property-01', job.property.id
     assert_equal '1 Main St', job.property.street
+    assert_equal 35.77, job.property.latitude
+    assert_equal(-78.63, job.property.longitude)
     assert_requested(:post, JobberStubs::GRAPHQL_URL) { |request| boundary_of(request).nil? }
   end
 

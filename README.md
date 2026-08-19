@@ -215,6 +215,8 @@ visit.property.id # => 'Z2lkOi8vS'
 visit.property.street # => '1 Main St'
 visit.property.city # => 'Raleigh'
 visit.property.zip # => '27601'
+visit.property.latitude # => 35.77
+visit.property.longitude # => -78.63
 visit.property.address # => { street: '1 Main St', city: 'Raleigh', state: 'NC',
                        #      zip: '27601', latitude: 35.77, longitude: -78.63 }
 visit.property.client.name # => whoever the place sits on the file of

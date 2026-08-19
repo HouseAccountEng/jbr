@@ -9,7 +9,8 @@ class MockCollectionsTest < Minitest::Test
     Jbr.mock.visits = [ { id: 'visit-02', title: 'Fixed it', starts_at: Time.now - 3600 },
                         { id: 'visit-01', title: 'Tune-up', job_id: 'job-01',
                           starts_at: starts_at, all_day: true, client_confirmed: false,
-                          property: { id: 'property-01', street: '1 Main St' },
+                          property: { id: 'property-01', street: '1 Main St',
+                                      latitude: 35.77, longitude: -78.63, },
                           client: { id: 'client-01', company_name: 'Ada & Co' }, }, ]
 
     visit = credentials.visits.upcoming.first
@@ -18,6 +19,8 @@ class MockCollectionsTest < Minitest::Test
     assert_equal 'Tune-up', visit.title
     assert_equal 'job-01', visit.job_id
     assert_equal '1 Main St', visit.property.street
+    assert_equal 35.77, visit.property.latitude
+    assert_equal(-78.63, visit.property.longitude)
     assert_equal 'client-01', visit.client.id
     assert_equal 'Ada & Co', visit.client.name
     assert visit.all_day?

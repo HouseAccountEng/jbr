@@ -1,3 +1,10 @@
+## [3.11.0] - 2026-08-19
+
+- [New] `Jbr::Property#latitude` and `#longitude`, reading the two the address already carried.
+  Every property query has asked Jobber for its `coordinates` for some time and `#address` has
+  answered them, but a caller wanting one had to open the hash -- and a mocked property answered
+  nothing for the whole address, so under `Jbr.mock` there was no way to reach them at all
+
 ## [3.8.0] - 2026-08-18
 
 - [New] `Jbr::Retriable`, a `Jbr::Error` for a query Jobber refused over what it costs rather

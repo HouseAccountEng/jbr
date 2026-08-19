@@ -10,6 +10,10 @@ module Jbr
 
     def zip = @node[:zip]
 
+    def latitude = @node[:latitude]
+
+    def longitude = @node[:longitude]
+
     def client = Mock::Client.new(node: @node.fetch(:client, {}))
   end
 end

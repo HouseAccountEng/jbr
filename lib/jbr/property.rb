@@ -35,6 +35,12 @@ module Jbr
     # @return [String, nil] the postal code the work happens in.
     def zip = address[:zip]
 
+    # @return [Float, nil] how far north the work happens.
+    def latitude = address[:latitude]
+
+    # @return [Float, nil] how far east the work happens.
+    def longitude = address[:longitude]
+
     # The fields a match is made on. City and state are written but never matched:
     # Jobber holds whatever was typed, so "NC" and "North Carolina" -- or "Winston Salem"
     # and "Winston-Salem" -- would read as two homes. The ZIP already places the home.
