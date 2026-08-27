@@ -1,0 +1,16 @@
+name: Mirror to the HouseAccountEng fork
+
+# A trigger only. The implementation is claudiob/workflows, shared with my other
+# mirrored repos; it lives here because GitHub evaluates triggers solely from
+# workflow files inside this repo, on the ref that was pushed.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * 1'   # safety net only; push and dispatch are the real paths
+
+jobs:
+  mirror:
+    uses: claudiob/workflows/.github/workflows/mirror-fork.yml@main
+    secrets: inherit
