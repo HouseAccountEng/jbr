@@ -3,12 +3,21 @@ module Jbr
   class Account < Resource
     # The query that reads the account behind the current credentials.
     FIND = <<~GRAPHQL
-      { account { id } }
+      { account { id name phone } }
     GRAPHQL
 
-    # @return [String] the account ID, read once and remembered.
-    def id
-      @id ||= @oauth.query(FIND).dig 'account', 'id'
-    end
+    # @return [String, nil] the account ID.
+    def id = node['id']
+
+    # @return [String, nil] what the business calls itself.
+    def name = node['name']
+
+    # @return [String, nil] the number the business is reached on, as Jobber holds it.
+    def phone = node['phone']
+
+  private
+
+    # Read once and remembered, whichever of the three is asked for first.
+    def node = @node = @node.presence || @oauth.query(FIND).fetch('account', {})
   end
 end

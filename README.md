@@ -61,6 +61,15 @@ oauth.expires_at # => 2026-05-22 14:32:53
 oauth.account_id # => 'Z2lkOi8vSm9iYmV'
 ```
 
+Read the account they belong to, once, however much of it is asked for:
+
+```ruby
+account = oauth.account
+account.id # => 'Z2lkOi8vSm9iYmV'
+account.name # => 'Acme Plumbing'
+account.phone # => '(704) 459-7540', as Jobber holds it
+```
+
 Revoke credentials:
 
 ```ruby
@@ -297,6 +306,12 @@ Mock a custom redirect URL:
 
 ```ruby
 Jbr.mock.oauth_url = 'https://example.com'
+```
+
+Mock the account the credentials belong to. Left unset, its ID is `account-01`:
+
+```ruby
+Jbr.mock.account = { id: 'account-01', name: 'Acme Plumbing', phone: '(704) 459-7540' }
 ```
 
 ### Requests

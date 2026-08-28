@@ -1,3 +1,10 @@
+## [3.12.0] - 2026-08-28
+
+- [New] `Jbr::Account#name` and `#phone`, beside the `#id` it already answered. An app storing
+  which account it is connected to had nothing to show for it but a GID; the three are read in
+  one query the first time any of them is asked for. `Jbr.mock.account` names all three for a
+  test, and answers `account-01` for the ID where an app names none
+
 ## [3.11.0] - 2026-08-19
 
 - [New] `Jbr::Property#latitude` and `#longitude`, reading the two the address already carried.

@@ -28,6 +28,18 @@ class MockTest < Minitest::Test
     Jbr.mock.oauth_error = nil
   end
 
+  def test_the_account_is_whatever_the_app_asked_for
+    Jbr.mock.account = { id: 'account-02', name: 'Acme Plumbing', phone: '(704) 459-7540' }
+
+    account = credentials.account
+
+    assert_equal 'account-02', account.id
+    assert_equal 'Acme Plumbing', account.name
+    assert_equal '(704) 459-7540', account.phone
+  ensure
+    Jbr.mock.account = nil
+  end
+
   def test_a_request_is_whatever_the_app_asked_for
     Jbr.mock.request = { id: 'request-01', client_id: 'client-01' }
 

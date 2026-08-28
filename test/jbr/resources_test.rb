@@ -1,12 +1,15 @@
 require 'test_helper'
 
 class ResourcesTest < Minitest::Test
-  def test_the_account_id_is_fetched_once
-    fetched = stub_graphql 'account' => { 'id' => 'account-01' }
+  def test_the_account_is_fetched_once_however_much_of_it_is_read
+    fetched = stub_graphql 'account' => {
+      'id' => 'account-01', 'name' => 'Acme Plumbing', 'phone' => '(704) 459-7540',
+    }
     account = oauth.account
 
     assert_equal 'account-01', account.id
-    assert_equal 'account-01', account.id
+    assert_equal 'Acme Plumbing', account.name
+    assert_equal '(704) 459-7540', account.phone
     assert_requested fetched, times: 1
   end
 
