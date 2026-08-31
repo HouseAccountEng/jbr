@@ -159,7 +159,10 @@ job.line_items # => an Array of the lines the job is made of
 line = job.line_items.first
 line.quantity # => 3, whole where Jobber's own Float has nothing after the point, and 3.5
               #    where it has: `3 Faucets`, or `3.5 Hours` for what was really billed
+line.id # => 'Njc5MjAw', the ID Jobber files the line by
 line.name # => 'Bathroom Faucet Installation'
+line.description # => 'Replace washers and reseat', what the line says beyond its name
+line.amount # => 285.0, what the line comes to -- what Jobber calls totalPrice
 line.to_s # => '3 Bathroom Faucet Installation', how many of what, and the name alone where
           #    Jobber holds no quantity for the line
 ```

@@ -1,8 +1,10 @@
 module Jbr
-  # One line of the work a job is made of: how many of a thing, and what it is called.
+  # One line of the work a job is made of: how many of a thing, what it is called,
+  # what it says, and what it comes to.
   class LineItem < Resource
-    # What Jobber calls each field of a line.
-    FIELDS = %w[quantity name]
+    # What Jobber calls each field of a line. The ID reads through {Resource#id}, so an app
+    # can tell a line it has seen before from a new one.
+    FIELDS = %w[id quantity name description totalPrice]
 
     # The most lines to read off one record. Bounded because Jobber prices a connection by the
     # page it is asked for and prices an unbounded one at its own maximum, so the lines of a
@@ -21,6 +23,12 @@ module Jbr
 
     # @return [String, nil] what the line is called.
     def name = @node['name']
+
+    # @return [String, nil] what the line says, beyond what it is called.
+    def description = @node['description']
+
+    # @return [Float, nil] what the line comes to — what Jobber calls `totalPrice`.
+    def amount = @node['totalPrice']
 
     # @return [String] how many of what: `3 Bathroom Faucet Installation`, and the name alone
     #   where Jobber holds no quantity for the line.

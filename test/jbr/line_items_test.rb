@@ -3,7 +3,8 @@ require 'test_helper'
 class LineItemsTest < Minitest::Test
   def test_a_job_reads_out_the_lines_it_was_asked_for
     stub_graphql 'jobs' => { 'nodes' => [ { 'id' => 'job-01', 'lineItems' => { 'nodes' => [
-      { 'quantity' => 3.0, 'name' => 'Bathroom Faucet Installation' },
+      { 'id' => 'line-01', 'quantity' => 3.0, 'name' => 'Bathroom Faucet Installation',
+        'description' => 'Replace washers and reseat', 'totalPrice' => 285.0, },
       { 'quantity' => 2.0, 'name' => 'Change Toilet Valve' },
       { 'quantity' => 1.5, 'name' => 'Hours of labour' },
       { 'quantity' => 0, 'name' => 'Waived disposal fee' },
@@ -16,8 +17,15 @@ class LineItemsTest < Minitest::Test
     # Every line Jobber holds, in the order it holds them, whatever each is quantified at
     assert_equal [ 'Bathroom Faucet Installation', 'Change Toilet Valve', 'Hours of labour',
                    'Waived disposal fee', 'Unquantified', ], items.map(&:name)
+    assert_equal 'line-01', items.first.id
     assert_equal 3, items.first.quantity
     assert_equal '3 Bathroom Faucet Installation', items.first.to_s
+    # A line also says what it is and what it comes to -- Jobber's totalPrice reads as amount
+    assert_equal 'Replace washers and reseat', items.first.description
+    assert_in_delta 285.0, items.first.amount
+    # A line Jobber holds neither for answers nil for both
+    assert_nil items.last.description
+    assert_nil items.last.amount
     # A whole quantity reads as an integer and a fraction keeps its point
     assert_in_delta 1.5, items[2].quantity
     assert_equal '1.5 Hours of labour', items[2].to_s

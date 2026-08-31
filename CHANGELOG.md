@@ -1,3 +1,11 @@
+## [3.13.0] - 2026-08-31
+
+- [New] `Jbr::LineItem#id`, `#description` and `#amount`, beside the `#quantity` and `#name` a
+  line already answered. The ID is how an app tells a line it has seen before from a new one,
+  the description is what the line says beyond what it is called, and the amount is what
+  Jobber calls `totalPrice`. Every query that lists lines now asks for all five, and a mocked
+  line answers whatever a test names for each
+
 ## [3.12.0] - 2026-08-28
 
 - [New] `Jbr::Account#name` and `#phone`, beside the `#id` it already answered. An app storing
