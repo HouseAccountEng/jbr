@@ -210,8 +210,8 @@ visit.id # => 'Z2lkOi8vS'
 visit.description # => 'Furnace tune-up', or nil where nobody titled it
 visit.starts_at # => 2026-08-09 14:00:00
 visit.ends_at # => 2026-08-09 16:00:00
-visit.all_day? # => false
-visit.confirmed? # => true
+visit.anytime? # => false
+visit.confirmed? # => true, which Jobber alone asks a client
 ```
 
 ### Locations and customers
@@ -357,7 +357,7 @@ Jbr.mock.visits = [ { id: 'visit-01', description: 'Furnace tune-up',
   location: { id: 'property-01', street: '1 Main St',
     customer: { id: 'client-01', name: 'Jane' } },
   starts_at: Date.tomorrow.noon, ends_at: Date.tomorrow.end_of_day,
-  all_day: false, confirmed: true } ]
+  anytime: false, confirmed: true } ]
 ```
 
 ### Invoices

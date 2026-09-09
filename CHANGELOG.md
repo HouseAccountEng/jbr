@@ -19,7 +19,7 @@
   nil where there was none -- in place of `#quote_id` and `#quote_total`, its title as
   `#description` and its instructions as `#notes`. `#summary` is gone with `#name`: a caller sums a job up from its lines and
   its description. `Job#title`, `#status` and `#client`, `Visit#title`, `#name`, `#job_id`
-  and `#client`, and `Visit#client_confirmed?`, now `#confirmed?`, are gone
+  and `#client`, are gone, and `Visit#client_confirmed?` is `#confirmed?`, `#all_day?` is `#anytime?`
 - [Breaking change] `includes` takes `:lines`, `:location` and `location: :customer` where it
   took `:line_items`, `:property`, `:client` and `property: :client`; a record answers
   `#lines` and `#location`, and a location `#customer`. `Location#address` and `#state` are gone,

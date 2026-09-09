@@ -10,7 +10,7 @@ class MockCollectionsTest < Minitest::Test
     starts_at = Time.now + 3600
     Jbr.mock.visits = [ { id: 'visit-02', description: 'Fixed it', starts_at: Time.now - 3600 },
                         { id: 'visit-01', description: 'Tune-up', starts_at: starts_at,
-                          all_day: true, confirmed: false,
+                          anytime: true, confirmed: false,
                           location: { id: 'property-01', street: '1 Main St',
                                       latitude: 35.77, longitude: -78.63,
                                       customer: { id: 'client-01', name: 'Ada & Co' }, }, }, ]
@@ -24,7 +24,7 @@ class MockCollectionsTest < Minitest::Test
     assert_equal(-78.63, visit.location.longitude)
     assert_equal 'client-01', visit.location.customer.id
     assert_equal 'Ada & Co', visit.location.customer.name
-    assert visit.all_day?
+    assert visit.anytime?
     refute visit.confirmed?
     assert_equal starts_at, visit.starts_at
     # One the app dated before now answers to past instead, and both answer to neither twice

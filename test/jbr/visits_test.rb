@@ -32,7 +32,7 @@ class VisitsTest < Minitest::Test
     assert_equal '5553335555', customer.phone
     assert_equal Time.utc(2026, 8, 9, 14), visit.starts_at
     assert_equal Time.utc(2026, 8, 9, 16), visit.ends_at
-    assert visit.all_day?
+    assert visit.anytime?
     refute visit.confirmed?
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
       request.body.include? 'nodes { id title startAt endAt allDay clientConfirmed property {'

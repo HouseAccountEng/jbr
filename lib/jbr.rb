@@ -46,6 +46,7 @@ require 'jbr/leads'
 require 'jbr/account'
 
 require 'jbr/mock/jobs'
+require 'jbr/mock/visit'
 require 'jbr/mock/visits'
 require 'jbr/mock/quote'
 require 'jbr/mock/quotes'
