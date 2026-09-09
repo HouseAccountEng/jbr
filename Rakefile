@@ -22,6 +22,21 @@ module FileLength
   end
 end
 
+# Finds the folders holding more code files than the style guide allows.
+module FolderSize
+  # The most code files a folder may hold, whatever sits in its subfolders aside.
+  MAX = 50
+
+  # @return [Array<Array>] every folder over the limit, fullest first.
+  def self.offenders
+    `git ls-files`.split("\n").grep(FileLength::CODE).
+      group_by { |path| File.dirname path }.
+      map { |folder, paths| [ folder, paths.size ] }.
+      select { |_folder, files| files > MAX }.
+      sort_by { |_folder, files| -files }
+  end
+end
+
 desc 'Fail when a tracked code file runs longer than 100 lines'
 task :file_length do
   offenders = FileLength.offenders
@@ -30,4 +45,12 @@ task :file_length do
   puts "No tracked code file over #{FileLength::MAX} lines"
 end
 
-task default: %i[file_length test]
+desc 'Fail when a tracked folder holds more than 50 code files'
+task :folder_size do
+  offenders = FolderSize.offenders
+  offenders.each { |folder, files| puts "#{folder}: #{files} files" }
+  abort "#{offenders.size} folder(s) over #{FolderSize::MAX} files" unless offenders.empty?
+  puts "No tracked folder over #{FolderSize::MAX} code files"
+end
+
+task default: %i[file_length folder_size test]
