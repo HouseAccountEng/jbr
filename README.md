@@ -231,7 +231,7 @@ visit.location.longitude # => -78.63
 
 visit.location.customer.name # => 'Jane', or the business's name where the client is one.
                              #    Never an empty string: a blank first name falls through
-visit.location.customer.last_name # => 'Doe'
+visit.location.customer.surname # => 'Doe'
 visit.location.customer.email # => 'jane@example.com'
 visit.location.customer.phone # => '5553335555', the ten digits to dial, or nil
 ```

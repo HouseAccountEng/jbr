@@ -2,7 +2,7 @@ module Jbr
   # A person the business works for, who Jobber calls a client.
   class Customer < Company::Customer
     # The node keys Jobber spells otherwise than the vocabulary.
-    def self.keys = { name: :firstName, last_name: :lastName }
+    def self.keys = { name: :firstName, surname: :lastName }
 
     # What Jobber calls each flat field of a client. The phones nest: see {Phone}.
     FIELDS = 'id firstName lastName companyName email'

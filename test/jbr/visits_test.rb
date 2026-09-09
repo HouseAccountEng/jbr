@@ -27,7 +27,7 @@ class VisitsTest < Minitest::Test
     # The client on the property's file comes with it, reached on the number we can dial
     assert_equal 'client-01', customer.id
     assert_equal 'Jane', customer.name
-    assert_equal 'Doe', customer.last_name
+    assert_equal 'Doe', customer.surname
     assert_equal 'jane@example.com', customer.email
     assert_equal '5553335555', customer.phone
     assert_equal Time.utc(2026, 8, 9, 14), visit.starts_at
