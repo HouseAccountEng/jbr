@@ -62,12 +62,12 @@ class MockTest < Minitest::Test
 
   def test_a_job_is_whatever_the_app_asked_for
     scheduled_at = Time.utc 2026, 5, 14
-    Jbr.mock.job = { id: 'job-01', quote_id: 'quote-01', scheduled_at: scheduled_at }
+    Jbr.mock.job = { id: 'job-01', quote: { id: 'quote-01' }, scheduled_at: scheduled_at }
 
     job = credentials.jobs.find 'anything'
 
     assert_equal 'job-01', job.id
-    assert_equal 'quote-01', job.quote_id
+    assert_equal 'quote-01', job.quote.id
     assert_equal scheduled_at, job.scheduled_at
     assert_nil job.completed_at
   end

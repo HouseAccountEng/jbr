@@ -137,8 +137,8 @@ Fetch a job from Jobber by the ID it is filed under:
 ```ruby
 job = account.jobs.find 'Njc5MTk5'
 job.id # => 'Z2lkOi8vS'
-job.quote_id # => 'Z2lkOi8vS'
-job.quote_amount # => 240.0, in dollars, as a BigDecimal
+job.quote.id # => 'Z2lkOi8vS', the quote the job was won with, or nil where none was
+job.quote.amount # => 240.0, in dollars, as a BigDecimal
 job.amount # => 260.0
 job.instructions # => 'Ring the doorbell twice'
 job.created_at # => 2026-05-10 09:15:00
@@ -332,7 +332,7 @@ Jbr.mock.quote = { id: 'quote-01', lead_id: 'request-01' }
 Mock successfully fetching a job by ID:
 
 ```ruby
-Jbr.mock.job = { id: 'job-01', quote_id: 'quote-01', scheduled_at: Date.tomorrow.noon }
+Jbr.mock.job = { id: 'job-01', quote: { id: 'quote-01' }, scheduled_at: Date.tomorrow.noon }
 ```
 
 Mock the jobs the account has. The mock dates nothing it was handed: what answers to
@@ -341,7 +341,7 @@ the one listed under the ID asked for:
 
 ```ruby
 Jbr.mock.jobs = [ { id: 'job-01', description: 'Furnace tune-up', instructions: 'Ring twice',
-  amount: 260.0, quote_amount: 240.0, created_at: Date.yesterday.noon,
+  amount: 260.0, quote: { id: 'quote-01', amount: 240.0 }, created_at: Date.yesterday.noon,
   scheduled_at: Date.yesterday.noon, completed_at: Date.today.noon,
   lines: [ { quantity: 3.0, name: 'Bathroom Faucet Installation' }, { name: 'Trip fee' } ],
   location: { id: 'property-01', street: '1 Main St',

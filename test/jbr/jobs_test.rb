@@ -28,9 +28,9 @@ class JobsTest < Minitest::Test
     assert_equal 'job-01', job.id
     assert_equal 'Tune-up', job.summary
     assert_equal 'Ring twice', job.instructions
-    assert_equal 'quote-01', job.quote_id
+    assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount
-    assert_equal 240, job.quote_amount
+    assert_equal 240, job.quote.amount
     assert_equal Time.utc(2026, 8, 8, 11), job.created_at
     assert_equal Time.utc(2026, 8, 9, 14), job.scheduled_at
     assert_equal Time.utc(2026, 8, 10, 9), job.completed_at

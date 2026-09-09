@@ -24,8 +24,8 @@ class ResourcesTest < Minitest::Test
 
     job = account.jobs.find 'job-01'
 
-    assert_equal 'quote-01', job.quote_id
-    assert_nil job.quote_amount
+    assert_equal 'quote-01', job.quote.id
+    assert_nil job.quote.amount
     assert_equal Time.utc(2026, 5, 14, 23, 2, 52), job.scheduled_at
     assert_equal Time.utc(2026, 5, 18, 11, 36, 13), job.completed_at
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|

@@ -1,10 +1,10 @@
 module Jbr
   # The quotes on a Jobber account, each reached by the ID Jobber files it under.
   class Quotes < Collection
-    # The query that reads one quote and the request it came from.
+    # The query that reads one quote, what it comes to, and the request it came from.
     FIND = <<~GRAPHQL
       query($id: EncodedId!) {
-        quote(id: $id) { id request { id } }
+        quote(id: $id) { id amounts { total } request { id } }
       }
     GRAPHQL
 

@@ -7,14 +7,8 @@ module Jbr
         completed_at: :completedAt, amount: :total, }
     end
 
-    # @return [String, nil] ID of the quote the job was won with.
-    def quote_id = @node.dig :quote, :id
-
-    # @return [BigDecimal, nil] what that quote came to, in dollars.
-    def quote_amount
-      total = @node.dig :quote, :amounts, :total
-      BigDecimal total.to_s if total.present?
-    end
+    # @return [Quote, nil] quote the job was won with, where Jobber filed one beside it.
+    def quote = record Quote, :quote
 
     # @return [Array<Line>] lines the job is made of, empty where the query never asked for
     #   them: a page costs what it carries, so nothing nested arrives unasked.

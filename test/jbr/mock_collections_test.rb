@@ -39,9 +39,10 @@ class MockCollectionsTest < Minitest::Test
     scheduled_at = Time.now + 3600
     created_at = Time.now - 86_400
     Jbr.mock.jobs = [ { id: 'job-02', scheduled_at: Time.now - 3600 },
-                      { id: 'job-01', quote_id: 'quote-01', scheduled_at: scheduled_at,
+                      { id: 'job-01', quote: { id: 'quote-01', amount: 240.0 },
+                        scheduled_at: scheduled_at,
                         description: 'Tune-up', instructions: 'Ring twice',
-                        amount: 260.0, quote_amount: 240.0, created_at: created_at,
+                        amount: 260.0, created_at: created_at,
                         lines: [ { quantity: 3.0, name: 'Faucet' }, { name: 'Trip fee' } ],
                         location: { id: 'property-01' }, }, ]
 
@@ -50,9 +51,9 @@ class MockCollectionsTest < Minitest::Test
     assert_equal 'job-01', job.id
     assert_equal '3 Faucet and Trip fee', job.summary
     assert_equal 'Ring twice', job.instructions
-    assert_equal 'quote-01', job.quote_id
+    assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount
-    assert_equal 240, job.quote_amount
+    assert_equal 240, job.quote.amount
     assert_equal created_at, job.created_at
     assert_equal scheduled_at, job.scheduled_at
     assert_equal 'property-01', job.location.id
