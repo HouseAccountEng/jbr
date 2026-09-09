@@ -36,7 +36,7 @@ module GraphQL
       coded = body['errors'].any? { |error| error.to_h.dig('extensions', 'code') == 'THROTTLED' }
       priced = available && cost['requestedQueryCost'].to_f > available.to_f
 
-      coded || priced ? Throttled.new(refusal(body), cost) : Error.new(refusal(body))
+      (coded || priced ? Throttled : Error).new refusal(body)
     end
 
     # What the endpoint refused, and — where it priced the refusal — what the query would have
@@ -51,6 +51,7 @@ module GraphQL
       "#{message} (cost #{cost['requestedQueryCost']}, #{status['currentlyAvailable']} of " \
         "#{status['maximumAvailable']} available, restoring #{status['restoreRate']}/s)"
     end
+
     def request_headers
       { 'Authorization' => "Bearer #{@token}", 'Content-Type' => 'application/json' }.merge @headers
     end

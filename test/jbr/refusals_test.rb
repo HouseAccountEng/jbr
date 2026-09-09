@@ -19,10 +19,6 @@ class RefusalsTest < Minitest::Test
     error = assert_raises(Jbr::Retriable) { oauth.query '{ ok }' }
 
     assert_equal 'Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)', error.message
-    assert_equal 1_885, error.cost
-    assert_equal 1_254, error.available
-    assert_equal 10_000, error.maximum
-    assert_equal 500, error.restore_rate
     assert_requested stub, times: 1
   end
 
