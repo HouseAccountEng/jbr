@@ -1,6 +1,7 @@
 module Jbr
   # A price the business sent to answer a lead, which Jobber calls a request.
   class Quote < Company::Quote
+    # Jobber alone files the request a quote answers beside it; the vocabulary knows no such link.
     # @return [Lead, nil] request the quote answers, where Jobber filed one beside it.
     def lead = record Lead, :request
 
