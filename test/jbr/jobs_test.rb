@@ -26,7 +26,7 @@ class JobsTest < Minitest::Test
     job = account.jobs.includes(location: :customer).first
 
     assert_equal 'job-01', job.id
-    assert_equal 'Tune-up', job.summary
+    assert_equal 'Tune-up', job.description
     assert_equal 'Ring twice', job.instructions
     assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount

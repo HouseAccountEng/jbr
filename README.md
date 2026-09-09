@@ -169,8 +169,8 @@ same way as anything nested, since a page costs what it carries:
 ```ruby
 job = account.jobs.includes(:lines).find 'Njc5MTk5'
 
-job.summary # => '3 Bathroom Faucet Installation and 2 Change Toilet Valve', the lines as a
-            #    sentence of how many of what. Falls back to the title, then to the ID
+job.description # => 'Fix the sink', the title somebody typed on the job
+job.lines.to_sentence # => '3 Bathroom Faucet Installation and 2 Change Toilet Valve'
 
 line = job.lines.first
 line.id # => 'Njc5MjAw', the ID Jobber files the line by
@@ -347,7 +347,7 @@ Jbr.mock.jobs = [ { id: 'job-01', description: 'Furnace tune-up', instructions: 
   location: { id: 'property-01', street: '1 Main St',
     customer: { id: 'client-01', name: 'Acme Property Management' } } } ]
 
-account.jobs.past.first.summary # => '3 Bathroom Faucet Installation and Trip fee'
+account.jobs.past.first.lines.map(&:to_s) # => ['3 Bathroom Faucet Installation', 'Trip fee']
 ```
 
 ### Visits

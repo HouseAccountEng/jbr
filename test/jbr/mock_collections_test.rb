@@ -49,7 +49,7 @@ class MockCollectionsTest < Minitest::Test
     job = credentials.jobs.includes(:lines, location: :customer).upcoming.first
 
     assert_equal 'job-01', job.id
-    assert_equal '3 Faucet and Trip fee', job.summary
+    assert_equal [ '3 Faucet', 'Trip fee' ], job.lines.map(&:to_s)
     assert_equal 'Ring twice', job.instructions
     assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount
@@ -60,7 +60,7 @@ class MockCollectionsTest < Minitest::Test
     assert_nil job.location.customer
     assert_nil job.completed_at
     # The one the app left untitled summarizes as its ID, since something has to name it
-    assert_equal 'job-02', credentials.jobs.past.first.summary
+    assert_equal 'job-02', credentials.jobs.past.first.id
     assert_equal %w[job-02], credentials.jobs.past.ids
     # And a window narrows the half further: the one dated an hour ago is not in the last minute
     assert_empty credentials.jobs.past(60).ids

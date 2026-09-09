@@ -31,9 +31,9 @@ class LinesTest < Minitest::Test
     assert_equal '1.5 Hours of labor', lines[2].to_s
     # A line Jobber holds no quantity for reads as its name alone
     assert_equal 'Unquantified', lines.last.to_s
-    # And a job summarizes itself by its lines, each as how many of what
+    # And a caller sums a job up by its lines, each as how many of what
     assert_equal '3 Bathroom Faucet Installation, 2 Change Toilet Valve, 1.5 Hours of labor, ' \
-                 '0 Waived disposal fee, and Unquantified', job.summary
+                 '0 Waived disposal fee, and Unquantified', job.lines.to_sentence
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
       request.body.include? 'lineItems(first: 20) { nodes { id name description quantity totalPrice'
     end
@@ -46,9 +46,8 @@ class LinesTest < Minitest::Test
     job = account.jobs.first
 
     assert_empty job.lines
-    # With no lines to summarize, a job reads as whatever it is called: here its ID, since
-    # nobody titled it either
-    assert_equal 'job-01', job.summary
+    # Nobody titled it either, so a caller has only the ID to call it by
+    assert_equal '', job.description
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
       !request.body.include? 'lineItems'
     end
