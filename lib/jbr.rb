@@ -1,68 +1,55 @@
 require 'json'
 require 'net/http'
 
-# Only the three Active Support files whose methods are used, rather than the whole of it:
-# Jobber answers a field it holds nothing for with an empty string as readily as with null,
-# and a caller who validates presence needs those to arrive as the same nothing. The third is
-# for the sentence a job's lines read as.
-require 'active_support/core_ext/object/blank'
+# The vocabulary every record here answers in, and the Active Support it brings along. One
+# more file of it: an address is sent without the fields a caller left blank.
+require 'company'
 require 'active_support/core_ext/enumerable'
-require 'active_support/core_ext/array/conversions'
 
 require 'graphql/error'
 require 'graphql/unauthorized'
 require 'graphql/throttled'
 require 'graphql/client'
 
-require 'jbr/mock'
-
-require 'jbr/url'
+require 'jbr/version'
 require 'jbr/error'
 require 'jbr/refused'
 require 'jbr/retriable'
 require 'jbr/token'
 require 'jbr/refreshing'
-# Phone before Cliental, and Cliental before the records that include it: what each asks
-# Jobber for about a client is built as they load.
-require 'jbr/phone'
-require 'jbr/cliental'
-require 'jbr/named'
-require 'jbr/resource'
-require 'jbr/request'
-require 'jbr/oauth'
+require 'jbr/querying'
+require 'jbr/authorizing'
+require 'jbr/mock'
 
-require 'jbr/account'
-# Property comes before Client and Visit: their queries read its fields as they load.
-require 'jbr/property'
-require 'jbr/properted'
+# Phone before Customer, and Location before Customers: what each asks Jobber for is built as
+# it loads. Every record before the collection that reads it, for the same reason.
+require 'jbr/phone'
+require 'jbr/customer'
+require 'jbr/location'
+require 'jbr/line'
+require 'jbr/job'
+require 'jbr/visit'
+require 'jbr/quote'
+require 'jbr/invoice'
+require 'jbr/lead'
+
+require 'jbr/collection'
 require 'jbr/includable'
 require 'jbr/listable'
-# LineItem before Itemized, and both before Job: the lines a job is made of are asked for
-# by a constant the include reads as it loads.
-require 'jbr/line_item'
-require 'jbr/itemized'
-require 'jbr/client'
-require 'jbr/invoice'
-require 'jbr/job'
 require 'jbr/jobs'
-require 'jbr/quote'
-require 'jbr/visit'
 require 'jbr/visits'
+require 'jbr/quotes'
+require 'jbr/invoices'
+require 'jbr/customers'
+require 'jbr/locations'
+require 'jbr/leads'
+require 'jbr/account'
 
-require 'jbr/mock/oauth'
-require 'jbr/mock/client'
-require 'jbr/mock/property'
-require 'jbr/mock/quote'
-require 'jbr/mock/line_item'
-require 'jbr/mock/job'
 require 'jbr/mock/jobs'
-require 'jbr/mock/invoice'
-require 'jbr/mock/request'
-require 'jbr/mock/account'
-require 'jbr/mock/url'
-require 'jbr/mock/visit'
 require 'jbr/mock/visits'
-
-require 'jbr/mocking'
+require 'jbr/mock/quotes'
+require 'jbr/mock/invoices'
+require 'jbr/mock/leads'
+require 'jbr/mock/account'
 
 require 'jbr/event'

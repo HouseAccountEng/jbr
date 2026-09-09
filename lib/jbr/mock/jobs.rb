@@ -3,14 +3,20 @@ module Jbr
   # narrowing a list, and reading it as records or as IDs, is the same code a real one runs.
   class Mock::Jobs < Jobs
     # The job filed under that ID where the app listed one, and otherwise the single job it
-    # named — which is every app that mocks a lookup without mocking a list.
-    # @return [Mock::Job] the job asked for.
-    def find(id) = Mock::Job.new node: listed(id) || Jbr.mock.job
+    # named, which is every app that mocks a lookup without mocking a list.
+    # @param id [String] ID the app filed the job under.
+    # @return [Company::Job, nil] job asked for, nil where the app named none.
+    def find(id)
+      node = listed(id) || Jbr.mock.job
+      Company::Job.new node: node if node
+    end
 
   private
 
     def walk(_statement)
-      Enumerator.new { |yielder| selected.each { |job| yielder << Mock::Job.new(node: job) } }
+      Enumerator.new do |yielder|
+        selected.each { |node| yielder << Company::Job.new(node: node) }
+      end
     end
 
     def selected = Jbr.mock.jobs.select { |job| scheduled? job[:scheduled_at] }

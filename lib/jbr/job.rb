@@ -1,40 +1,26 @@
 module Jbr
-  # Work a Jobber user accepted and scheduled.
-  class Job < Resource
-    include Cliental, Itemized, Named, Properted
+  # Work the business accepted and scheduled.
+  class Job < Company::Job
+    # The node keys Jobber spells otherwise than the vocabulary.
+    def self.keys
+      { description: :title, created_at: :createdAt, scheduled_at: :startAt,
+        completed_at: :completedAt, amount: :total, }
+    end
 
-    # @return [String, nil] what the job is called, where whoever opened it named it.
-    def title = @node['title']
+    # @return [String, nil] ID of the quote the job was won with.
+    def quote_id = @node.dig :quote, :id
 
-    # @return [String, nil] what the work is, in the words whoever opened the job wrote.
-    def instructions = @node['instructions']
+    # @return [BigDecimal, nil] what that quote came to, in dollars.
+    def quote_amount
+      total = @node.dig :quote, :amounts, :total
+      BigDecimal total.to_s if total.present?
+    end
 
-    # What the job's lines add up to, each as how many of what: `3 Faucet install and 2 Valve
-    # change` — `to_sentence` reading each line's own string form. The lines say what the work
-    # was where a title only says what it was called, so this reads better than one, and falls
-    # back to {#name} where the job has no lines or the query never asked for them.
-    # @return [String] the lines as a sentence, or the title, or the ID. Never nil, never empty.
-    def summary = line_items.to_sentence.presence || name
+    # @return [Array<Line>] lines the job is made of, empty where the query never asked for
+    #   them: a page costs what it carries, so nothing nested arrives unasked.
+    def lines = @node.dig(:lineItems, :nodes).to_a.map { |node| Line.new node: node }
 
-    # @return [String, nil] where Jobber files the job in its own workflow.
-    def status = @node['jobStatus']
-
-    # @return [String, nil] the ID of the quote the job was won with.
-    def quote_id = @node.dig 'quote', 'id'
-
-    # @return [Float, nil] what the job comes to.
-    def total = @node['total']
-
-    # @return [Float, nil] what the quote the job was won with came to.
-    def quote_total = @node.dig 'quote', 'amounts', 'total'
-
-    # @return [Time, nil] the job opening time
-    def created_at = time 'createdAt'
-
-    # @return [Time, nil] the job scheduled time
-    def scheduled_at = time 'startAt'
-
-    # @return [Time, nil] the job completed time
-    def completed_at = time 'completedAt'
+    # @return [Location, nil] where the work happens, where it came back beside the job.
+    def location = record Location, :property
   end
 end

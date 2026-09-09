@@ -1,17 +1,18 @@
 module Jbr
   # The visits on a Jobber account, oldest first, walked a page at a time.
-  class Visits < Resource
+  class Visits < Collection
     include Includable, Listable
 
-    # What a visit answers with, before anything it was asked to bring back with it.
-    FIELDS = 'id title startAt endAt allDay clientConfirmed job { id }'
+    # What a visit answers with, before anything it was asked to bring back with it: the keys
+    # the vocabulary reads, none written by hand.
+    FIELDS = Visit.node_keys.join ' '
 
     # Shadows Enumerable#find on purpose, the way jobs do: a visit is reached by the ID Jobber
     # files it under, not by asking every visit on the account whether it is the one.
-    # @param id [String] the Jobber ID of the visit.
+    # @param id [String] Jobber ID of the visit.
     # @return [Visit, nil] nil when Jobber has no visit under that ID.
     def find(id)
-      node = @oauth.query(one, variables: { id: id })['visit']
+      node = @account.query(one, variables: { id: id })['visit']
       Visit.new node: node if node
     end
 

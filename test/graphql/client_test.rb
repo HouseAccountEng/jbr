@@ -8,7 +8,7 @@ class GraphQLClientTest < Minitest::Test
       }).
       to_return body: { data: { 'ok' => true } }.to_json
 
-    assert_equal({ 'ok' => true }, oauth.query('{ ok }'))
+    assert_equal({ 'ok' => true }, account.query('{ ok }'))
     assert_requested posted
   end
 

@@ -10,9 +10,9 @@ class SharingTest < Minitest::Test
 
     def exclusively = yield @credentials
 
-    def write(oauth)
-      @credentials = { access_token: oauth.access_token, refresh_token: oauth.refresh_token,
-                       expires_at: oauth.expires_at, invalid_at: oauth.invalid_at, }
+    def write(account)
+      @credentials = { access_token: account.access_token, refresh_token: account.refresh_token,
+                       expires_at: account.expires_at, invalid_at: account.invalid_at, }
     end
 
     def to_h = @credentials
@@ -54,5 +54,5 @@ class SharingTest < Minitest::Test
 private
 
   # Credentials as one worker of many builds them, from the store they all share.
-  def sharer = Jbr::OAuth.new(**@credentials, store: @vault)
+  def sharer = Jbr::Account.new(**@credentials, store: @vault)
 end

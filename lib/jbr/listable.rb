@@ -6,8 +6,8 @@ module Jbr
     include Enumerable
 
     # Records a page, not forty and not a hundred: what an includes brings back is charged for
-    # on top of every row of it, so a page of jobs carrying their lines, their property and its
-    # client priced past what a bucket holds. Half the page costs half the query and loses
+    # on top of every row of it, so a page of jobs carrying their lines, their location and its
+    # customer priced past what a bucket holds. Half the page costs half the query and loses
     # nothing, since a walk simply reads more pages.
     PAGE = 20
 
@@ -37,7 +37,7 @@ module Jbr
 
     # The ID Jobber files each record under, and nothing else about it: the cheapest question
     # an account can be walked with, and the one to ask where every record is then read on its
-    # own through {#find}.
+    # own through `find`.
     # @return [Array<String>] every ID in the list, every page of them read.
     def ids = walk(ids_page).map(&:id)
 
@@ -48,7 +48,7 @@ module Jbr
     # The same moment is the near end of a window, so the far end is measured from it too.
     def narrowed(after: nil, before: nil)
       bounds = { after: after&.iso8601, before: before&.iso8601 }.compact
-      self.class.new oauth: @oauth, includes: @includes, filter: { startAt: bounds }
+      self.class.new account: @account, includes: @includes, filter: { startAt: bounds }
     end
 
     # Whether a moment falls in the stretch of the schedule the list was narrowed to, for
@@ -70,7 +70,7 @@ module Jbr
       Enumerator.new do |yielder|
         after = nil
         loop do
-          answered = @oauth.query statement, variables: { after: after, filter: @filter }.compact
+          answered = @account.query statement, variables: { after: after, filter: @filter }.compact
           current = answered.fetch field, {}
           current.fetch('nodes', []).each { |node| yielder << item(node) }
           break unless current.dig 'pageInfo', 'hasNextPage'

@@ -17,8 +17,8 @@ module JobberStubs
   # Where an authorization code is exchanged for credentials.
   TOKEN_URL = 'https://api.getjobber.com/api/oauth/token'
 
-  # @return [Jbr::OAuth] credentials whose access token is still good.
-  def oauth = Jbr::OAuth.new access_token: 'token', refresh_token: 'refresh'
+  # @return [Jbr::Account] credentials whose access token is still good.
+  def account = Jbr::Account.new access_token: 'token', refresh_token: 'refresh'
 
   # Answer the next GraphQL post with this data payload.
   # @param data [Hash] the +data+ the endpoint returns.

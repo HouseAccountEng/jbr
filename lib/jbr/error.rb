@@ -1,4 +1,4 @@
 module Jbr
   # An error raised when Jobber refuses a request.
-  Error = Class.new StandardError
+  Error = Class.new Company::Error
 end

@@ -6,10 +6,10 @@ class LookupsTest < Minitest::Test
   def test_a_visit_is_reached_by_the_id_jobber_files_it_under
     stub_graphql 'visit' => { 'id' => 'visit-01', 'title' => 'Tune-up' }
 
-    visit = oauth.visits.find 'visit-01'
+    visit = account.visits.find 'visit-01'
 
     assert_equal 'visit-01', visit.id
-    assert_equal 'Tune-up', visit.title
+    assert_equal 'Tune-up', visit.description
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
       request.body.include? '"id":"visit-01"'
     end
@@ -18,6 +18,6 @@ class LookupsTest < Minitest::Test
   def test_an_id_jobber_has_no_visit_for_is_nil_rather_than_a_blank_visit
     stub_graphql 'visit' => nil
 
-    assert_nil oauth.visits.find 'visit-99'
+    assert_nil account.visits.find 'visit-99'
   end
 end
