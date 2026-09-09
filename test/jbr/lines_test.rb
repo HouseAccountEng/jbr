@@ -19,21 +19,17 @@ class LinesTest < Minitest::Test
                    'Waived disposal fee', 'Unquantified', ], lines.map(&:name)
     assert_equal 'line-01', lines.first.id
     assert_equal 3, lines.first.quantity
-    assert_equal '3 Bathroom Faucet Installation', lines.first.to_s
     # A line also says what it is and what it comes to: Jobber's totalPrice reads as amount
     assert_equal 'Replace washers and reseat', lines.first.description
     assert_equal 285, lines.first.amount
     # A line Jobber holds neither for answers nil for both
     assert_nil lines.last.description
     assert_nil lines.last.amount
-    # A whole quantity reads as an integer and a fraction keeps its point
+    # A whole quantity reads as an integer, a fraction keeps its point, and a line Jobber
+    # holds no quantity for answers none
     assert_in_delta 1.5, lines[2].quantity
-    assert_equal '1.5 Hours of labor', lines[2].to_s
-    # A line Jobber holds no quantity for reads as its name alone
-    assert_equal 'Unquantified', lines.last.to_s
-    # And a caller sums a job up by its lines, each as how many of what
-    assert_equal '3 Bathroom Faucet Installation, 2 Change Toilet Valve, 1.5 Hours of labor, ' \
-                 '0 Waived disposal fee, and Unquantified', job.lines.to_sentence
+    assert_equal 0, lines[3].quantity
+    assert_nil lines.last.quantity
     assert_requested(:post, JobberStubs::GRAPHQL_URL) do |request|
       request.body.include? 'lineItems(first: 20) { nodes { id name description quantity totalPrice'
     end

@@ -170,7 +170,7 @@ same way as anything nested, since a page costs what it carries:
 job = account.jobs.includes(:lines).find 'Njc5MTk5'
 
 job.description # => 'Fix the sink', the title somebody typed on the job
-job.lines.to_sentence # => '3 Bathroom Faucet Installation and 2 Change Toilet Valve'
+job.lines.map(&:name) # => ['Bathroom Faucet Installation', 'Change Toilet Valve']
 
 line = job.lines.first
 line.id # => 'Njc5MjAw', the ID Jobber files the line by
@@ -179,8 +179,6 @@ line.quantity # => 3, whole where Jobber's own Float has nothing after the point
 line.name # => 'Bathroom Faucet Installation'
 line.description # => 'Replace washers and reseat', what the line says beyond its name
 line.amount # => 285.0, what the line comes to, which Jobber calls totalPrice
-line.to_s # => '3 Bathroom Faucet Installation', and the name alone where Jobber holds no
-          #    quantity for the line
 ```
 
 Every line Jobber holds is in the list, up to twenty of them, in the order it holds them. Ask
@@ -347,7 +345,7 @@ Jbr.mock.jobs = [ { id: 'job-01', description: 'Furnace tune-up', notes: 'Ring t
   location: { id: 'property-01', street: '1 Main St',
     customer: { id: 'client-01', name: 'Acme Property Management' } } } ]
 
-account.jobs.past.first.lines.map(&:to_s) # => ['3 Bathroom Faucet Installation', 'Trip fee']
+account.jobs.past.first.lines.map(&:name) # => ['Bathroom Faucet Installation', 'Trip fee']
 ```
 
 ### Visits
