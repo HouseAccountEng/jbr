@@ -32,8 +32,10 @@
   `lines`, `location`, `customer`, `confirmed`, `lead`, `job`. A mock collection
   answers the vocabulary's own kinds built from those hashes, so `Jbr::Mock::Job` and its
   siblings are gone; `Jbr.mock = nil` hands the accounts back to Jobber
-- [Breaking change] `Jbr::Retriable#cost`, `#available`, `#maximum` and `#restore_rate` are
-  gone; the numbers stay in the message. `Jbr::Error` descends from `Company::Error`
+- [Breaking change] `Jbr::Retriable` is `Jbr::Throttled`, a `Company::Throttled` rather than a
+  `Jbr::Error`, so one rescue retries a refusal for rate from any platform; its `#cost`,
+  `#available`, `#maximum` and `#restore_rate` are gone and the numbers stay in the message.
+  `Jbr::Error` descends from `Company::Error`
 - [Fix] An `includes` chained after `past` or `upcoming` keeps the window it was asked on. It
   used to rebuild the list without the filter, so `account.jobs.past(1.year).includes(:lines)`
   walked every job the account ever had

@@ -64,12 +64,12 @@ class MockCollectionsTest < Minitest::Test
   end
 
   def test_a_list_mocked_as_failing_fails_where_it_is_walked_and_not_where_it_is_looked_up
-    Jbr.mock.jobs = Enumerator.new { raise Jbr::Retriable, 'Throttled' }
+    Jbr.mock.jobs = Enumerator.new { raise Jbr::Throttled, 'Throttled' }
     Jbr.mock.job = { id: 'job-01' }
 
     jobs = credentials.jobs.past
 
-    assert_raises(Jbr::Retriable) { jobs.ids }
+    assert_raises(Jbr::Throttled) { jobs.ids }
     assert_equal 'job-01', credentials.jobs.find('job-01').id
   end
 

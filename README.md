@@ -252,7 +252,7 @@ what happened, so the caller can decide:
 Throttled (cost 1885, 1254 of 10000 available, restoring 500/s)
 ```
 
-That one is a `Jbr::Retriable`, a `Jbr::Error` for a refusal worth asking again: 631 points
+That one is a `Jbr::Throttled`, a `Company::Throttled` for a refusal worth asking again: 631 points
 short of a query the bucket holds five times over, which a second would have refilled. A cost
 above what the bucket holds when full is worth nothing but a smaller query. Either way the
 decision belongs to whoever called: from a background job, letting it fail so the queue brings

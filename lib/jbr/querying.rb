@@ -23,7 +23,7 @@ module Jbr
     # @param statement [String] query or mutation to run.
     # @param variables [Hash] what the statement takes.
     # @return [Hash] data Jobber answered, or empty when the credentials are dead.
-    # @raise [Retriable] where Jobber refused the statement for what it costs.
+    # @raise [Throttled] where Jobber refused the statement for what it costs.
     # @raise [Error] where Jobber refused the statement, or took a mutation and would not act.
     def query(statement, variables: {})
       data = client.query statement, variables: variables
@@ -34,7 +34,7 @@ module Jbr
     rescue GraphQL::Unauthorized
       refresh ? retry : {}
     rescue GraphQL::Throttled => error
-      raise Retriable, error.message
+      raise Throttled, error.message
     rescue GraphQL::Error => error
       raise Error, error.message
     end
