@@ -16,8 +16,8 @@
   issued where the work never was
 - [Breaking change] A job reads `#amount` as a `BigDecimal` where it read `#total` as a Float,
   answers the quote it was won with as `#quote` -- a `Jbr::Quote` with `id` and `amount`,
-  nil where there was none -- in place of `#quote_id` and `#quote_total`, and its title as
-  `#description`. `#summary` is gone with `#name`: a caller sums a job up from its lines and
+  nil where there was none -- in place of `#quote_id` and `#quote_total`, its title as
+  `#description` and its instructions as `#notes`. `#summary` is gone with `#name`: a caller sums a job up from its lines and
   its description. `Job#title`, `#status` and `#client`, `Visit#title`, `#name`, `#job_id`
   and `#client`, and `Visit#client_confirmed?`, now `#confirmed?`, are gone
 - [Breaking change] `includes` takes `:lines`, `:location` and `location: :customer` where it

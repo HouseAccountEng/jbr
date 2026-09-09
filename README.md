@@ -140,7 +140,7 @@ job.id # => 'Z2lkOi8vS'
 job.quote.id # => 'Z2lkOi8vS', the quote the job was won with, or nil where none was
 job.quote.amount # => 240.0, in dollars, as a BigDecimal
 job.amount # => 260.0
-job.instructions # => 'Ring the doorbell twice'
+job.notes # => 'Ring the doorbell twice', what Jobber calls the instructions
 job.created_at # => 2026-05-10 09:15:00
 job.scheduled_at # => 2026-05-14 23:02:52
 job.completed_at # => 2026-05-18 11:36:13
@@ -340,7 +340,7 @@ Mock the jobs the account has. The mock dates nothing it was handed: what answer
 the one listed under the ID asked for:
 
 ```ruby
-Jbr.mock.jobs = [ { id: 'job-01', description: 'Furnace tune-up', instructions: 'Ring twice',
+Jbr.mock.jobs = [ { id: 'job-01', description: 'Furnace tune-up', notes: 'Ring twice',
   amount: 260.0, quote: { id: 'quote-01', amount: 240.0 }, created_at: Date.yesterday.noon,
   scheduled_at: Date.yesterday.noon, completed_at: Date.today.noon,
   lines: [ { quantity: 3.0, name: 'Bathroom Faucet Installation' }, { name: 'Trip fee' } ],

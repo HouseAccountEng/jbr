@@ -41,7 +41,7 @@ class MockCollectionsTest < Minitest::Test
     Jbr.mock.jobs = [ { id: 'job-02', scheduled_at: Time.now - 3600 },
                       { id: 'job-01', quote: { id: 'quote-01', amount: 240.0 },
                         scheduled_at: scheduled_at,
-                        description: 'Tune-up', instructions: 'Ring twice',
+                        description: 'Tune-up', notes: 'Ring twice',
                         amount: 260.0, created_at: created_at,
                         lines: [ { quantity: 3.0, name: 'Faucet' }, { name: 'Trip fee' } ],
                         location: { id: 'property-01' }, }, ]
@@ -50,7 +50,7 @@ class MockCollectionsTest < Minitest::Test
 
     assert_equal 'job-01', job.id
     assert_equal [ '3 Faucet', 'Trip fee' ], job.lines.map(&:to_s)
-    assert_equal 'Ring twice', job.instructions
+    assert_equal 'Ring twice', job.notes
     assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount
     assert_equal 240, job.quote.amount
@@ -66,7 +66,7 @@ class MockCollectionsTest < Minitest::Test
     assert_empty credentials.jobs.past(60).ids
     assert_equal %w[job-02 job-01], credentials.jobs.map(&:id)
     # A lookup answers the one listed under that ID
-    assert_equal 'Ring twice', credentials.jobs.find('job-01').instructions
+    assert_equal 'Ring twice', credentials.jobs.find('job-01').notes
   end
 
   def test_a_list_mocked_as_failing_fails_where_it_is_walked_and_not_where_it_is_looked_up

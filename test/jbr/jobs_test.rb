@@ -27,7 +27,7 @@ class JobsTest < Minitest::Test
 
     assert_equal 'job-01', job.id
     assert_equal 'Tune-up', job.description
-    assert_equal 'Ring twice', job.instructions
+    assert_equal 'Ring twice', job.notes
     assert_equal 'quote-01', job.quote.id
     assert_equal 260, job.amount
     assert_equal 240, job.quote.amount

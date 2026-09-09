@@ -3,8 +3,8 @@ module Jbr
   class Job < Company::Job
     # The node keys Jobber spells otherwise than the vocabulary.
     def self.keys
-      { description: :title, created_at: :createdAt, scheduled_at: :startAt,
-        completed_at: :completedAt, amount: :total, }
+      { description: :title, notes: :instructions, created_at: :createdAt,
+        scheduled_at: :startAt, completed_at: :completedAt, amount: :total, }
     end
 
     # @return [Quote, nil] quote the job was won with, where Jobber filed one beside it.
