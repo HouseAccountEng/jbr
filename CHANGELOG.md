@@ -21,8 +21,9 @@
   its description. `Job#title`, `#status` and `#client`, `Visit#title`, `#name`, `#job_id`
   and `#client`, are gone, and `Visit#client_confirmed?` is `#confirmed?`, `#all_day?` is `#anytime?`
 - [Breaking change] `includes` takes `:lines`, `:location` and `location: :customer` where it
-  took `:line_items`, `:property`, `:client` and `property: :client`; a record answers
-  `#lines` and `#location`, and a location `#customer`. `Location#address` and `#state` are gone,
+  took `:line_items`, `:property`, `:client` and `property: :client`, and only on jobs: a visit
+  happens where its job does, so it answers `#job` and no `#location` or `includes` of its own. A
+  job answers `#lines` and `#location`, and a location `#customer`. `Location#address` and `#state` are gone,
   as are `Customer#first_name` and `#company_name`: `#name` answers the first name, or the
   business's name where a person has none. `Jbr::LineItem`, `Jbr::Property`, `Jbr::Client` and
   `Jbr::Request` are `Jbr::Line`, `Jbr::Location`, `Jbr::Customer` and `Jbr::Lead`

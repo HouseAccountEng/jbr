@@ -8,9 +8,9 @@ class IdsTest < Minitest::Test
                                'pageInfo' => { 'hasNextPage' => false },
     }
 
-    assert_equal %w[visit-01], account.visits.includes(location: :customer).upcoming.ids
-    # Asked for a location and its customer, and told about neither: a page of IDs is IDs
-    assert_asked_for 'visits(first: 100', without: 'property', dated: 'after'
+    assert_equal %w[visit-01], account.visits.upcoming.ids
+    # Told nothing of the job each belongs to: a page of IDs is IDs
+    assert_asked_for 'visits(first: 100', without: 'job', dated: 'after'
   end
 
   def test_a_page_of_job_ids_carries_nothing_else_and_is_five_times_the_size

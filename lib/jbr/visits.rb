@@ -1,11 +1,10 @@
 module Jbr
   # The visits on a Jobber account, oldest first, walked a page at a time.
   class Visits < Collection
-    include Includable, Listable
+    include Listable
 
-    # What a visit answers with, before anything it was asked to bring back with it: the keys
-    # the vocabulary reads, none written by hand.
-    FIELDS = Visit.node_keys.join ' '
+    # What a visit answers with: the keys the vocabulary reads, and the job it belongs to.
+    FIELDS = "#{Visit.node_keys.join ' '} job { id }"
 
     # Shadows Enumerable#find on purpose, the way jobs do: a visit is reached by the ID Jobber
     # files it under, not by asking every visit on the account whether it is the one.
@@ -18,12 +17,12 @@ module Jbr
 
   private
 
-    def page = paged "#{FIELDS} #{selections}", PAGE
+    def page = paged FIELDS, PAGE
 
     def one
       <<~GRAPHQL
         query($id: EncodedId!) {
-          visit(id: $id) { #{FIELDS} #{selections} }
+          visit(id: $id) { #{FIELDS} }
         }
       GRAPHQL
     end

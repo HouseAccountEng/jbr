@@ -212,31 +212,33 @@ visit.starts_at # => 2026-08-09 14:00:00
 visit.ends_at # => 2026-08-09 16:00:00
 visit.anytime? # => false
 visit.confirmed? # => true, which Jobber alone asks a client
+visit.job.id # => 'Z2lkOi8vSm9i', the job the stop belongs to, where it happens and for whom
 ```
 
 ### Locations and customers
 
 Jobber prices a query by what it brings back, so nothing nested comes back unless it is
-asked for. Chain `includes` the way Active Record does, on visits or on jobs:
+asked for. Chain `includes` the way Active Record does, on jobs; a visit happens where its job
+does, so it names the job and nothing else:
 
 ```ruby
-visit = account.visits.includes(location: :customer).upcoming.first
+job = account.jobs.includes(location: :customer).find 'Z2lkOi8vSm9i'
 
-visit.location.id # => 'Z2lkOi8vS'
-visit.location.street # => '1 Main St'
-visit.location.city # => 'Raleigh'
-visit.location.zip # => '27601'
-visit.location.latitude # => 35.77
-visit.location.longitude # => -78.63
+job.location.id # => 'Z2lkOi8vS'
+job.location.street # => '1 Main St'
+job.location.city # => 'Raleigh'
+job.location.zip # => '27601'
+job.location.latitude # => 35.77
+job.location.longitude # => -78.63
 
-visit.location.customer.name # => 'Jane', or the business's name where the client is one.
-                             #    Never an empty string: a blank first name falls through
-visit.location.customer.surname # => 'Doe'
-visit.location.customer.email # => 'jane@example.com'
-visit.location.customer.phone # => '5553335555', the ten digits to dial, or nil
+job.location.customer.name # => 'Jane', or the business's name where the client is one.
+                           #    Never an empty string: a blank first name falls through
+job.location.customer.surname # => 'Doe'
+job.location.customer.email # => 'jane@example.com'
+job.location.customer.phone # => '5553335555', the ten digits to dial, or nil
 ```
 
-Ask for nothing and nothing arrives: `account.visits.first.location` is nil where the query
+Ask for nothing and nothing arrives: `account.jobs.first.location` is nil where the query
 never named one.
 
 ### Rate limits

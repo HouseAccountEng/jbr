@@ -10,20 +10,13 @@ class MockCollectionsTest < Minitest::Test
     starts_at = Time.now + 3600
     Jbr.mock.visits = [ { id: 'visit-02', description: 'Fixed it', starts_at: Time.now - 3600 },
                         { id: 'visit-01', description: 'Tune-up', starts_at: starts_at,
-                          anytime: true, confirmed: false,
-                          location: { id: 'property-01', street: '1 Main St',
-                                      latitude: 35.77, longitude: -78.63,
-                                      customer: { id: 'client-01', name: 'Ada & Co' }, }, }, ]
+                          anytime: true, confirmed: false, job: { id: 'job-01' }, }, ]
 
-    visit = credentials.visits.includes(location: :customer).upcoming.first
+    visit = credentials.visits.upcoming.first
 
     assert_equal 'visit-01', visit.id
     assert_equal 'Tune-up', visit.description
-    assert_equal '1 Main St', visit.location.street
-    assert_equal 35.77, visit.location.latitude
-    assert_equal(-78.63, visit.location.longitude)
-    assert_equal 'client-01', visit.location.customer.id
-    assert_equal 'Ada & Co', visit.location.customer.name
+    assert_equal 'job-01', visit.job.id
     assert visit.anytime?
     refute visit.confirmed?
     assert_equal starts_at, visit.starts_at
