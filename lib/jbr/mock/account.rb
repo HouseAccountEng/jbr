@@ -14,11 +14,11 @@ module Jbr
     # @return [Mock::Quotes] the one quote the app named.
     def quotes = Mock::Quotes.new
 
-    # @return [Mock::Invoices] the one invoice the app named.
-    def invoices = Mock::Invoices.new
-
     # @return [Mock::Leads] the one lead the app named.
     def leads = Mock::Leads.new
+
+    # @return [Mock::Invoices] the one invoice the app named.
+    def invoices = Mock::Invoices.new
 
     # Revoking a mocked token asks nobody.
     def delete; end

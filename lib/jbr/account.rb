@@ -43,10 +43,10 @@ module Jbr
     # @return [Quotes] quotes of the business.
     def quotes = Quotes.new account: self
 
-    # @return [Invoices] invoices of the business.
-    def invoices = Invoices.new account: self
-
     # @return [Leads] leads of the business.
     def leads = Leads.new account: self
+
+    # @return [Invoices] invoices of the business.
+    def invoices = Invoices.new account: self
   end
 end
