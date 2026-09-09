@@ -18,7 +18,7 @@ class LeadsTest < Minitest::Test
     lead = create
 
     assert_equal 'request-01', lead.id
-    assert_equal 'client-01', lead.customer_id
+    assert_equal 'client-01', lead.customer.id
     assert_requested opened
     assert_requested(:post, GRAPHQL_URL) do |request|
       input = JSON.parse(request.body).dig 'variables', 'input'
@@ -42,7 +42,7 @@ class LeadsTest < Minitest::Test
     lead = create email: nil, address: {}
 
     assert_equal 'request-01', lead.id
-    assert_nil lead.customer_id
+    assert_nil lead.customer
     assert_requested(:post, GRAPHQL_URL) do |request|
       input = JSON.parse(request.body).dig 'variables', 'input'
       request.body.include?('clientCreate') && !input.key?('emails') && !input.key?('properties')
@@ -60,7 +60,7 @@ class LeadsTest < Minitest::Test
     ] }
     opened = stub_opened_at 'property-new', client: 'newer'
 
-    assert_equal 'newer', create.customer_id
+    assert_equal 'newer', create.customer.id
     assert_requested opened
   end
 

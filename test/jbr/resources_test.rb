@@ -7,7 +7,7 @@ class ResourcesTest < Minitest::Test
     quote = account.quotes.find 'quote-01'
 
     assert_equal 'quote-01', quote.id
-    assert_equal 'request-01', quote.lead_id
+    assert_equal 'request-01', quote.lead.id
   end
 
   def test_a_missing_quote_is_nil

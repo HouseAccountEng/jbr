@@ -41,23 +41,23 @@ class MockTest < Minitest::Test
   end
 
   def test_a_lead_is_whatever_the_app_asked_for
-    Jbr.mock.lead = { id: 'request-01', customer_id: 'client-01' }
+    Jbr.mock.lead = { id: 'request-01', customer: { id: 'client-01' } }
 
     lead = credentials.leads.create title: 'New Plumber Lead'
 
     assert_equal 'request-01', lead.id
-    assert_equal 'client-01', lead.customer_id
+    assert_equal 'client-01', lead.customer.id
   end
 
   def test_a_quote_is_whatever_the_app_asked_for
     assert_nil credentials.quotes.find('anything')
 
-    Jbr.mock.quote = { id: 'quote-01', lead_id: 'request-01' }
+    Jbr.mock.quote = { id: 'quote-01', lead: { id: 'request-01' } }
 
     quote = credentials.quotes.find 'anything'
 
     assert_equal 'quote-01', quote.id
-    assert_equal 'request-01', quote.lead_id
+    assert_equal 'request-01', quote.lead.id
   end
 
   def test_a_job_is_whatever_the_app_asked_for
@@ -76,12 +76,13 @@ class MockTest < Minitest::Test
     assert_nil credentials.invoices.find('anything')
 
     issued_at = Time.utc 2026, 5, 22
-    Jbr.mock.invoice = { id: 'invoice-01', job_id: 'job-01', amount: 19.99, issued_at: issued_at }
+    Jbr.mock.invoice = { id: 'invoice-01', job: { id: 'job-01' }, amount: 19.99,
+                         issued_at: issued_at, }
 
     invoice = credentials.invoices.find 'anything'
 
     assert_equal 'invoice-01', invoice.id
-    assert_equal 'job-01', invoice.job_id
+    assert_equal 'job-01', invoice.job.id
     assert_equal BigDecimal('19.99'), invoice.amount
     assert_equal issued_at, invoice.fulfilled_at
   end

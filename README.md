@@ -114,7 +114,7 @@ lead = account.leads.create first_name: 'Jane', last_name: 'Doe', phone: '555333
   email: 'jane@example.com', title: 'New Plumber Lead', instructions: 'Needs new faucet',
   address: { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601' }
 lead.id # => 'Z2lkOi8vSm9iYmVyL'
-lead.customer_id # => 'MwMTU0Mg'
+lead.customer.id # => 'MwMTU0Mg', the client the request was opened against
 ```
 
 A mutation Jobber takes but will not act on, a phone it calls invalid or an email it already
@@ -127,7 +127,7 @@ Fetch a quote from Jobber, and the lead it answers:
 ```ruby
 quote = account.quotes.find 'Z2lkOi8vS'
 quote.id # => 'Z2lkOi8vS'
-quote.lead_id # => 'Z2lkOi8vSm9iYmVyL'
+quote.lead.id # => 'Z2lkOi8vSm9iYmVyL', the request the quote answers, or nil where none
 ```
 
 ### Jobs
@@ -194,7 +194,7 @@ Fetch a non-draft invoice from Jobber:
 ```ruby
 invoice = account.invoices.find 'MjU3ODA0'
 invoice.id # => 'MjU3ODA0'
-invoice.job_id # => 'Z2lkOi8vS'
+invoice.job.id # => 'Z2lkOi8vS', the job the invoice bills, or nil where none
 invoice.amount # => 40.30, in dollars, as a BigDecimal
 invoice.fulfilled_at # => 2026-05-22 14:32:53, when the job was finished, or the invoice issued
 ```
@@ -316,7 +316,7 @@ Jbr.mock.business = { id: 'account-01', name: 'Acme Plumbing', phone: '(704) 459
 Mock successfully filing a lead:
 
 ```ruby
-Jbr.mock.lead = { id: 'request-01', customer_id: 'client-01' }
+Jbr.mock.lead = { id: 'request-01', customer: { id: 'client-01' } }
 ```
 
 ### Quotes
@@ -324,7 +324,7 @@ Jbr.mock.lead = { id: 'request-01', customer_id: 'client-01' }
 Mock successfully fetching a quote:
 
 ```ruby
-Jbr.mock.quote = { id: 'quote-01', lead_id: 'request-01' }
+Jbr.mock.quote = { id: 'quote-01', lead: { id: 'request-01' } }
 ```
 
 ### Jobs
@@ -367,6 +367,6 @@ Jbr.mock.visits = [ { id: 'visit-01', description: 'Furnace tune-up',
 Mock successfully fetching an invoice:
 
 ```ruby
-Jbr.mock.invoice = { id: 'invoice-01', job_id: 'job-01', amount: 19.99,
+Jbr.mock.invoice = { id: 'invoice-01', job: { id: 'job-01' }, amount: 19.99,
   issued_at: Date.yesterday.noon }
 ```

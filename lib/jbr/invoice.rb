@@ -5,16 +5,14 @@ module Jbr
     def self.keys = { amount: :total, issued_at: :issuedDate }
 
     # Jobber lists the jobs an invoice bills, and one it bills one.
-    # @return [String, nil] ID of the job the invoice bills.
-    def job_id = job&.id
-
-  private
-
-    def completed_at = job&.completed_at
-
+    # @return [Job, nil] job the invoice bills, where Jobber listed one.
     def job
       node = @node.dig :jobs, :nodes, 0
       Job.new node: node if node
     end
+
+  private
+
+    def completed_at = job&.completed_at
   end
 end

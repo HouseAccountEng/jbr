@@ -12,7 +12,7 @@ class InvoicesTest < Minitest::Test
     invoice = account.invoices.find 'invoice-01'
 
     assert_equal 'invoice-01', invoice.id
-    assert_equal 'job-01', invoice.job_id
+    assert_equal 'job-01', invoice.job.id
     assert_equal BigDecimal('40.30'), invoice.amount
     assert_equal Time.utc(2026, 5, 22, 14, 32, 53), invoice.fulfilled_at
   end
@@ -33,7 +33,7 @@ class InvoicesTest < Minitest::Test
 
     invoice = account.invoices.find 'invoice-01'
 
-    assert_nil invoice.job_id
+    assert_nil invoice.job
     assert_nil invoice.amount
     assert_nil invoice.fulfilled_at
   end

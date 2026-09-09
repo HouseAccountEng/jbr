@@ -10,10 +10,10 @@
   dial rather than the string Jobber holds
 - [Breaking change] `#requests` is `#leads`, and `leads.create` takes its keywords by name
   (`first_name:`, `last_name:`, `phone:`, `email:`, `title:`, `instructions:`, `address:`) and
-  answers a `Jbr::Lead` with `id` and `customer_id` rather than the collection that filed it.
-  `Quote#request_id` is `#lead_id`; `Invoice#total`, `#issued_at` and `#completed_at` are
-  `#amount`, a `BigDecimal`, and `#fulfilled_at`, the moment the work was finished or the bill
-  issued where the work never was
+  answers a `Jbr::Lead` with `id` and `customer` rather than the collection that filed it.
+  `Quote#request_id` is `#lead`, a `Jbr::Lead`; `Invoice#job_id` is `#job`, a `Jbr::Job`;
+  `Invoice#total`, `#issued_at` and `#completed_at` are `#amount`, a `BigDecimal`, and
+  `#fulfilled_at`, the moment the work was finished or the bill issued where the work never was
 - [Breaking change] A job reads `#amount` as a `BigDecimal` where it read `#total` as a Float,
   answers the quote it was won with as `#quote` -- a `Jbr::Quote` with `id` and `amount`,
   nil where there was none -- in place of `#quote_id` and `#quote_total`, its title as
@@ -28,7 +28,7 @@
   `Jbr::Request` are `Jbr::Line`, `Jbr::Location`, `Jbr::Customer` and `Jbr::Lead`
 - [Breaking change] `Jbr.mock` takes `business` and `lead` where it took `account` and `request`,
   and every slot reads by the vocabulary's keys: `description`, `amount`, `quote`,
-  `lines`, `location`, `customer`, `confirmed`, `lead_id`, `customer_id`. A mock collection
+  `lines`, `location`, `customer`, `confirmed`, `lead`, `job`. A mock collection
   answers the vocabulary's own kinds built from those hashes, so `Jbr::Mock::Job` and its
   siblings are gone; `Jbr.mock = nil` hands the accounts back to Jobber
 - [Breaking change] `Jbr::Retriable#cost`, `#available`, `#maximum` and `#restore_rate` are
