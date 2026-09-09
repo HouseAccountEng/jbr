@@ -1,3 +1,47 @@
+## [Unreleased]
+
+## [4.0.0] - 2026-09-09
+
+- [Breaking change] `Jbr::Account` is the gateway, and reads in the vocabulary the `company` gem
+  names. It replaces `Jbr::OAuth` and the `Jbr.oauth_for`, `Jbr.create_oauth` and
+  `Jbr.oauth_url_for` entry points: `Jbr::Account.new credentials`, `Jbr::Account.create code:,
+  redirect_uri:`, `Jbr::Account.url_for redirect_uri:, state:`, and `Jbr::Account.client_secret`.
+  `#account` is `#business`, answering a `Company::Business` whose `phone` is the ten digits to
+  dial rather than the string Jobber holds
+- [Breaking change] `#requests` is `#leads`, and `leads.create` takes its keywords by name
+  (`first_name:`, `last_name:`, `phone:`, `email:`, `title:`, `instructions:`, `address:`) and
+  answers a `Jbr::Lead` with `id` and `customer_id` rather than the collection that filed it.
+  `Quote#request_id` is `#lead_id`; `Invoice#total`, `#issued_at` and `#completed_at` are
+  `#amount`, a `BigDecimal`, and `#fulfilled_at`, the moment the work was finished or the bill
+  issued where the work never was
+- [Breaking change] A job reads `#amount` and `#quote_amount` as `BigDecimal`s where it read
+  `#total` and `#quote_total` as Floats, and `#summary` falls back to the title and then to the
+  ID where it fell back to `#name`. `Job#title`, `#name`, `#status` and `#client`, `Visit#title`,
+  `#name`, `#job_id` and `#client`, and `Visit#client_confirmed?`, now `#confirmed?`, are gone
+- [Breaking change] `includes` takes `:lines`, `:location` and `location: :customer` where it
+  took `:line_items`, `:property`, `:client` and `property: :client`; a record answers
+  `#lines` and `#location`, and a location `#customer`. `Location#address` and `#state` are gone,
+  as are `Customer#first_name` and `#company_name`: `#name` answers the first name, or the
+  business's name where a person has none. `Jbr::LineItem`, `Jbr::Property`, `Jbr::Client` and
+  `Jbr::Request` are `Jbr::Line`, `Jbr::Location`, `Jbr::Customer` and `Jbr::Lead`
+- [Breaking change] `Jbr.mock` takes `business` and `lead` where it took `account` and `request`,
+  and every slot reads by the vocabulary's keys: `description`, `amount`, `quote_amount`,
+  `lines`, `location`, `customer`, `confirmed`, `lead_id`, `customer_id`. A mock collection
+  answers the vocabulary's own kinds built from those hashes, so `Jbr::Mock::Job` and its
+  siblings are gone; `Jbr.mock = nil` hands the accounts back to Jobber
+- [Breaking change] `Jbr::Retriable#cost`, `#available`, `#maximum` and `#restore_rate` are
+  gone; the numbers stay in the message. `Jbr::Error` descends from `Company::Error`
+- [Fix] An `includes` chained after `past` or `upcoming` keeps the window it was asked on. It
+  used to rebuild the list without the filter, so `account.jobs.past(1.year).includes(:lines)`
+  walked every job the account ever had
+- [Fix] A mutation Jobber takes but will not act on raises `Jbr::Error` with the reasons Jobber
+  gave. It answers those with a 200 and the messages under the mutation's own `userErrors`,
+  which nothing read, so a client Jobber refused to open came back with a nil ID and the
+  request filed against nobody
+- [Change] Every selection Jobber is asked for is generated from the keys the vocabulary reads
+  wherever Jobber's shape is flat, so a kind gaining a reader asks for it without a query
+  written by hand
+
 ## [3.13.0] - 2026-08-31
 
 - [New] `Jbr::LineItem#id`, `#description` and `#amount`, beside the `#quantity` and `#name` a
