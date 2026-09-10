@@ -1,6 +1,6 @@
 module Jbr
   # The invoices on a Jobber account, each reached by the ID Jobber files it under.
-  class Invoices < Collection
+  class Invoices < Reader
     # The query that reads one invoice, its total, its date and the job it bills.
     FIND = <<~GRAPHQL
       query($id: EncodedId!) {

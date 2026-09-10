@@ -3,8 +3,6 @@ module Jbr
   # a query by the page it asks for and by what every row of that page carries, so a list is
   # read either as records or as the IDs alone, each with a page sized to what it carries.
   module Listable
-    include Enumerable
-
     # Records a page, not forty and not a hundred: what an includes brings back is charged for
     # on top of every row of it, so a page of jobs carrying their lines, their location and its
     # customer priced past what a bucket holds. Half the page costs half the query and loses
@@ -19,20 +17,14 @@ module Jbr
     # starts, and a page is read only once the one before it runs out.
     def each(&) = walk(page).each(&)
 
-    # @param within [ActiveSupport::Duration, Numeric, nil] how far ahead to look, or nil for
-    #   as far ahead as the account is scheduled.
-    # @return [Listable] the same list, narrowed to what is scheduled from now on.
-    def upcoming(within = nil)
-      now = Time.now
-      narrowed after: now, before: (now + within if within)
-    end
-
-    # @param within [ActiveSupport::Duration, Numeric, nil] how far back to look, or nil for
-    #   as far back as the account goes.
-    # @return [Listable] the same list, narrowed to what started before now.
-    def past(within = nil)
-      now = Time.now
-      narrowed before: now, after: (now - within if within)
+    # The two halves of a schedule split at one moment rather than per page: read page by page
+    # the boundary would slide, and something could cross it unseen.
+    # @param from [Time, nil] the moment the window opens, or nothing for as far back as it goes.
+    # @param to [Time, nil] the moment the window closes, or nothing for as far ahead as it goes.
+    # @return [Collection] the same list, narrowed to what starts between the two.
+    def between(from, to)
+      bounds = { after: from&.iso8601, before: to&.iso8601 }.compact
+      self.class.new account: @account, includes: @includes, filter: { startAt: bounds }
     end
 
     # The ID Jobber files each record under, and nothing else about it: the cheapest question
@@ -42,14 +34,6 @@ module Jbr
     def ids = walk(ids_page).map(&:id)
 
   private
-
-    # The two halves of a schedule, split at the moment they are asked for rather than per
-    # page: read page by page the boundary would slide, and something could cross it unseen.
-    # The same moment is the near end of a window, so the far end is measured from it too.
-    def narrowed(after: nil, before: nil)
-      bounds = { after: after&.iso8601, before: before&.iso8601 }.compact
-      self.class.new account: @account, includes: @includes, filter: { startAt: bounds }
-    end
 
     # Whether a moment falls in the stretch of the schedule the list was narrowed to, for
     # anything answering one without asking Jobber. A record with no moment at all is in an

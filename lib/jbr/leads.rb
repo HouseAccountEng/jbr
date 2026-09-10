@@ -1,6 +1,6 @@
 module Jbr
   # The requests on a Jobber account's board: work somebody asked the business for.
-  class Leads < Collection
+  class Leads < Reader
     # The mutation that opens a request against a client and a property.
     CREATE = <<~GRAPHQL
       mutation($input: RequestCreateInput!) {

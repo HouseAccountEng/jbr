@@ -1,6 +1,6 @@
 module Jbr
   # The clients on a Jobber account, reached by phone and opened where none answers to it.
-  class Customers < Collection
+  class Customers < Reader
     # The query that finds a client by phone, with the properties already on file.
     LOOKUP = <<~GRAPHQL
       query($searchTerm: String!) {

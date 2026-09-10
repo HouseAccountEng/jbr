@@ -1,6 +1,6 @@
 module Jbr
   # The properties on a client's file, and the one a request is opened at.
-  class Locations < Collection
+  class Locations < Reader
     # The mutation that adds a property to a client already on file.
     CREATE = <<~GRAPHQL
       mutation($clientId: EncodedId!, $input: PropertyCreateInput!) {

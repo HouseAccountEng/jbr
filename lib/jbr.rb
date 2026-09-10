@@ -33,6 +33,7 @@ require 'jbr/quote'
 require 'jbr/invoice'
 require 'jbr/lead'
 
+require 'jbr/reader'
 require 'jbr/collection'
 require 'jbr/includable'
 require 'jbr/listable'
