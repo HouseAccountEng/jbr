@@ -35,11 +35,11 @@ module Jbr
 
   private
 
-    # Whether a moment falls in the stretch of the schedule the list was narrowed to, for
-    # anything answering one without asking Jobber. A record with no moment at all is in an
-    # open-ended upcoming list, since nothing has started it, and in no window, since a window
-    # is a stretch it would have to have fallen in.
     def scheduled?(at)
+      # Whether a moment falls in the stretch of the schedule the list was narrowed to, for
+      # anything answering one without asking Jobber. A record with no moment at all is in an
+      # open-ended upcoming list, since nothing has started it, and in no window, since a window
+      # is a stretch it would have to have fallen in.
       return true unless @filter
 
       after, before = @filter[:startAt].values_at :after, :before
@@ -48,9 +48,9 @@ module Jbr
       (after.nil? || at >= Time.iso8601(after)) && (before.nil? || at <= Time.iso8601(before))
     end
 
-    # Every record a paged query answers, one at a time, a page read only once the one before
-    # it runs out. The filter is data: narrowed to nothing, the query narrows nothing.
     def walk(statement)
+      # Every record a paged query answers, one at a time, a page read only once the one before
+      # it runs out. The filter is data: narrowed to nothing, the query narrows nothing.
       Enumerator.new do |yielder|
         after = nil
         loop do

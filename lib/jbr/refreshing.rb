@@ -5,19 +5,19 @@ module Jbr
   module Refreshing
   private
 
-    # With no store there is nobody to compare against: refresh, and leave what we end up
-    # holding for the caller to persist.
     def refresh
+      # With no store there is nobody to compare against: refresh, and leave what we end up
+      # holding for the caller to persist.
       return exchange unless @store
 
       @store.exclusively { |stored| renew stored }
     end
 
-    # Under the store's lock, holding what it says right now. A token that is no longer the one
-    # we tried is one somebody else has already replaced, and adopting it asks Jobber nothing —
-    # which is what keeps a queue of workers from refreshing a hundred times over, each with a
-    # refresh token the first of them has already spent.
     def renew(stored)
+      # Under the store's lock, holding what it says right now. A token that is no longer the one
+      # we tried is one somebody else has already replaced, and adopting it asks Jobber nothing —
+      # which is what keeps a queue of workers from refreshing a hundred times over, each with a
+      # refresh token the first of them has already spent.
       return adopt stored if stored[:access_token] != @access_token
 
       @refresh_token = stored[:refresh_token]
@@ -37,9 +37,9 @@ module Jbr
       true
     end
 
-    # Refused while holding the freshest refresh token there is, so the grant itself is dead
-    # rather than our copy being behind.
     def refused
+      # Refused while holding the freshest refresh token there is, so the grant itself is dead
+      # rather than our copy being behind.
       @invalid_at = Time.now
       @store&.write self
       false

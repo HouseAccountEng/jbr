@@ -40,9 +40,9 @@ module Jbr
       output.dig 'propertyCreate', 'properties', 0, 'id'
     end
 
-    # Street and ZIP have to agree, and only those two: Jobber holds whatever was typed for the
-    # city and state, so "NC" and "North Carolina" would read as two homes.
     def same_address?(wanted, location)
+      # Street and ZIP have to agree, and only those two: Jobber holds whatever was typed for the
+      # city and state, so "NC" and "North Carolina" would read as two homes.
       wanted[:street1] == location.street && wanted[:postalCode] == location.zip
     end
   end

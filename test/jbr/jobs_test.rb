@@ -60,7 +60,9 @@ class JobsTest < Minitest::Test
     assert_requested(:post, JobberStubs::GRAPHQL_URL, times: 1) { |it| asked_of(it) == [] }
 
     account.jobs.includes(:location).to_a
-    assert_requested(:post, JobberStubs::GRAPHQL_URL, times: 1) { |it| asked_of(it) == %w[property] }
+    assert_requested(:post, JobberStubs::GRAPHQL_URL, times: 1) do |it|
+      asked_of(it) == %w[property]
+    end
 
     account.jobs.includes(:lines, location: :customer).to_a
     assert_requested(:post, JobberStubs::GRAPHQL_URL, times: 1) do |it|

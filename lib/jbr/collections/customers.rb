@@ -33,8 +33,8 @@ module Jbr
 
   private
 
-    # The most recently updated of the clients answering to the number.
     def find_by(phone)
+      # The most recently updated of the clients answering to the number.
       output = @account.query LOOKUP, variables: { searchTerm: phone }
       recent = output.dig('clientPhones', 'nodes').to_a.max_by do |node|
         node.dig('client', 'updatedAt') || ''

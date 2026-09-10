@@ -51,9 +51,9 @@ module Jbr
       GraphQL::Client.new endpoint: ENDPOINT, token: @access_token, headers: HEADERS
     end
 
-    # A mutation Jobber took but would not act on answers 200, with the reasons under the
-    # mutation's own field rather than beside the data.
     def user_errors(data)
+      # A mutation Jobber took but would not act on answers 200, with the reasons under the
+      # mutation's own field rather than beside the data.
       fields = data.each_value.select { |field| field.is_a? Hash }
       fields.flat_map { |field| Array(field['userErrors']) }
     end

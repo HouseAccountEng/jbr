@@ -26,7 +26,9 @@ class MockTest < Minitest::Test
   def test_a_rejected_flow_raises_the_message_the_app_set
     Jbr.mock.oauth_error = 'Flow rejected'
 
-    error = assert_raises(Jbr::Error) { Jbr::Account.create code: 'code', redirect_uri: 'https://x' }
+    error = assert_raises(Jbr::Error) do
+      Jbr::Account.create code: 'code', redirect_uri: 'https://x'
+    end
     assert_equal 'Flow rejected', error.message
   end
 

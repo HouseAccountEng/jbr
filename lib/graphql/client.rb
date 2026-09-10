@@ -28,9 +28,9 @@ module GraphQL
 
   private
 
-    # Refused over cost where the endpoint names the code for it, or prices the query above
-    # what it says was left. Anything else is a refusal of the query itself.
     def refusal_for(body)
+      # Refused over cost where the endpoint names the code for it, or prices the query above
+      # what it says was left. Anything else is a refusal of the query itself.
       cost = body['extensions'].to_h['cost'].to_h
       available = cost['throttleStatus'].to_h['currentlyAvailable']
       coded = body['errors'].any? { |error| error.to_h.dig('extensions', 'code') == 'THROTTLED' }
@@ -39,10 +39,10 @@ module GraphQL
       (coded || priced ? Throttled : Error).new refusal(body)
     end
 
-    # What the endpoint refused, and — where it priced the refusal — what the query would have
-    # cost against what was available. `Throttled` on its own leaves a caller unable to tell a
-    # query too big to ever run from a bucket that a moment would have refilled.
     def refusal(body)
+      # What the endpoint refused, and — where it priced the refusal — what the query would have
+      # cost against what was available. `Throttled` on its own leaves a caller unable to tell a
+      # query too big to ever run from a bucket that a moment would have refilled.
       message = body['errors'].map { |error| error['message'] }.join '; '
       cost = body['extensions'].to_h['cost'].to_h
       status = cost['throttleStatus'].to_h

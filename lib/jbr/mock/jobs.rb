@@ -21,8 +21,10 @@ module Jbr
 
     def selected = Jbr.mock.jobs.select { |job| scheduled? job[:scheduled_at] }
 
-    # Only a real list is looked through: an app that mocked the list as something raising
-    # was mocking the walk failing, and a lookup is a question of its own.
-    def listed(id) = (Jbr.mock.jobs.find { |job| job[:id] == id } if Jbr.mock.jobs.is_a? Array)
+    def listed(id)
+      # Only a real list is looked through: an app that mocked the list as something raising
+      # was mocking the walk failing, and a lookup is a question of its own.
+      (Jbr.mock.jobs.find { |job| job[:id] == id } if Jbr.mock.jobs.is_a? Array)
+    end
   end
 end
