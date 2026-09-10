@@ -110,8 +110,9 @@ File a request on the account's board, against the client answering to the phone
 property at the address, opening either where Jobber has none:
 
 ```ruby
-lead = account.leads.create first_name: 'Jane', last_name: 'Doe', phone: '5553335555',
-  email: 'jane@example.com', title: 'New Plumber Lead', instructions: 'Needs new faucet',
+lead = account.leads.create name: 'Jane', surname: 'Doe', phone: '5553335555',
+  email: 'jane@example.com', description: 'New Plumber Lead', notes: 'Needs new faucet',
+  source: nil, # Jobber has no source for a request, so this one is dropped
   address: { street: '1 Main St', city: 'Raleigh', state: 'NC', zip: '27601' }
 lead.id # => 'Z2lkOi8vSm9iYmVyL'
 lead.customer.id # => 'MwMTU0Mg', the client the request was opened against

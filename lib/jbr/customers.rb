@@ -22,13 +22,13 @@ module Jbr
 
     # Reach the client answering to a number, opening one with the rest where Jobber has none.
     # @param phone [String] number to match on, and to file a new client under.
-    # @param first_name [String] what to call them.
-    # @param last_name [String, nil] their last name.
+    # @param name [String] what to call them.
+    # @param surname [String, nil] their surname.
     # @param email [String, nil] address they are written to.
     # @param address [Hash] any of :street, :city, :state and :zip, the first place on file.
     # @return [Customer] the client, with the places on their file.
-    def find_or_create_by(phone:, first_name:, last_name:, email:, address:)
-      find_by(phone) || create(phone:, first_name:, last_name:, email:, address:)
+    def find_or_create_by(phone:, name:, surname:, email:, address:)
+      find_by(phone) || create(phone:, name:, surname:, email:, address:)
     end
 
   private
@@ -42,8 +42,8 @@ module Jbr
       Customer.new node: recent['client'] if recent
     end
 
-    def create(phone:, first_name:, last_name:, email:, address:)
-      input = { firstName: first_name, lastName: last_name,
+    def create(phone:, name:, surname:, email:, address:)
+      input = { firstName: name, lastName: surname,
                 phones: [ { number: phone, primary: true } ],
                 emails: ([ { address: email, primary: true } ] if email.present?),
                 properties: ([ { address: Locations.address_from(address) } ] if address.present?),

@@ -9,7 +9,9 @@
   `#account` is `#business`, answering a `Company::Business` whose `phone` is the ten digits to
   dial rather than the string Jobber holds
 - [Breaking change] `#requests` is `#leads`, and `leads.create` takes its keywords by name
-  (`first_name:`, `last_name:`, `phone:`, `email:`, `title:`, `instructions:`, `address:`) and
+  as the vocabulary names them (`name:`, `surname:`, `phone:`, `email:`, `address:`,
+  `description:` for the title, `notes:` for the instructions, and a `source:` Jobber has no
+  field for) and
   answers a `Jbr::Lead` with `id` and `customer` rather than the collection that filed it.
   `Quote#request_id` is `#lead`, a `Jbr::Lead`; `Invoice#job_id` is `#job`, a `Jbr::Job`;
   `Invoice#total`, `#issued_at` and `#completed_at` are `#amount`, a `BigDecimal`, and

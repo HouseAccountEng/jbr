@@ -57,3 +57,8 @@ Layout/LineLength:
 # lines per site, so the cop is declined and the rule held in review.
 Style/MethodCallWithArgsParentheses:
   Enabled: false
+
+# The vocabulary names a keyword for every platform, and one a platform has no field for is
+# taken and dropped rather than left out of the signature
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true

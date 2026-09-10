@@ -75,8 +75,8 @@ private
   end
 
   def create
-    account.leads.create first_name: 'Jane', last_name: 'Doe', phone: '5553335555',
-      email: 'jane@example.com', title: 'New Plumber Lead', instructions: 'Needs new faucet',
-      address: ADDRESS
+    account.leads.create name: 'Jane', surname: 'Doe', phone: '5553335555',
+      email: 'jane@example.com', address: ADDRESS, description: 'New Plumber Lead',
+      notes: 'Needs new faucet', source: nil
   end
 end

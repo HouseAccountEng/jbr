@@ -79,8 +79,8 @@ class LeadsTest < Minitest::Test
 private
 
   def create(email: 'jane@example.com', address: ADDRESS)
-    account.leads.create first_name: 'Jane', last_name: 'Doe', phone: '5553335555', email: email,
-      title: 'New Plumber Lead', instructions: 'Needs new faucet', address: address
+    account.leads.create name: 'Jane', surname: 'Doe', phone: '5553335555', email: email,
+      address: address, description: 'New Plumber Lead', notes: 'Needs new faucet', source: nil
   end
 
   # Answer a request opened against that property, with the title and the instructions given.
