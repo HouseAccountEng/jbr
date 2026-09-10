@@ -46,7 +46,7 @@ module Jbr
     # @return [Leads] leads of the business.
     def leads = Leads.new account: self
 
-    # @return [Invoices] invoices of the business.
+    # @return [Invoices] invoices of the business, which Jobber alone answers for.
     def invoices = Invoices.new account: self
   end
 end
