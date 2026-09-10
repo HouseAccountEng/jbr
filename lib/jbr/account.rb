@@ -40,7 +40,7 @@ module Jbr
     # @return [Visits] visits of the business.
     def visits = Visits.new account: self
 
-    # @return [Quotes] quotes of the business.
+    # @return [Quotes] quotes of the business, which Jobber alone lists.
     def quotes = Quotes.new account: self
 
     # @return [Leads] leads of the business.
