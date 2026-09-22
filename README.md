@@ -360,6 +360,10 @@ Raising is deliberate rather than answering with none. An empty week and a fully
 the same shape, so a caller reading none as none would quietly stop offering the business
 altogether, with nothing in a log and no page looking wrong.
 
+`account.areas` -- the ZIP codes a business groups under a name -- answers none, and asks
+Jobber nothing. Jobber draws no service areas, so an empty list is the truth about it rather
+than a guess, and unlike an empty week it cannot be mistaken for a full one.
+
 A visit is still not all Jobber schedules. A task, an event and the two kinds of reminder sit
 on the same calendar and are read past unread, because Jobber's filter takes one kind and not
 two, so both the kinds that are visits are asked for and the rest let go as they arrive.
