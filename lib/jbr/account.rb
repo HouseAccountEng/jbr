@@ -44,6 +44,9 @@ module Jbr
     # @note Needs the Users scope, without which Jobber refuses the query rather than the field.
     def technicians = Technicians.new account: self
 
+    # @return [Array] areas of the business: none, since Jobber draws no service areas.
+    def areas = []
+
     # @return [Quotes] quotes of the business, which Jobber alone lists.
     def quotes = Quotes.new account: self
 

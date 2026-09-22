@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [7.1.0] - 2026-09-22
+
+- [Feature] `account.areas`, which the vocabulary names in `company` 4.1, answers an empty list
+  and makes no request: Jobber draws no service areas. The pin is `~> 4.1`.
+
+- [Note] Answering none is deliberate, where `windows` raises. An empty week reads the same as
+  a fully booked one; no areas is simply what Jobber has.
+
 ## [7.0.0] - 2026-09-17
 
 - [Breaking change] The vocabulary is `company` 4.0: `of` takes the ID Jobber files a technician

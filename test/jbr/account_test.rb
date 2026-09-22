@@ -33,6 +33,12 @@ class AccountTest < Minitest::Test
     assert_equal 'invalid_grant', error.message
   end
 
+  # Jobber draws no service areas, so there is nothing to ask it for.
+  def test_the_areas_are_none_and_cost_no_request
+    assert_empty account.areas
+    assert_not_requested :post, GRAPHQL_URL
+  end
+
   def test_the_business_is_read_by_the_keys_the_vocabulary_names
     stub_graphql 'account' => {
       'id' => 'account-01', 'name' => 'Acme Plumbing', 'phone' => '(704) 459-7540',
